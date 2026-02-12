@@ -3,13 +3,13 @@
  * Login, Register, Profile Management
  */
 // At the VERY TOP of auth.js, add this import:
-const { authenticateToken, authorize } = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
+
+const { authenticateToken, authorize, JWT_SECRET } = require('../middleware/auth');
 
 /**
  * @route   POST /api/login
