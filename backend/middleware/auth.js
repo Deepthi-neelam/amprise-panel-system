@@ -69,4 +69,4 @@ module.exports = {
     authenticateToken,
     authorize,
     JWT_SECRET
-};  
+};
