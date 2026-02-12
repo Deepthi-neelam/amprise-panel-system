@@ -1,0 +1,4326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMPRISE - Advanced Panel Estimation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.6s ease;
+            position: relative;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: moveBackground 20s linear infinite;
+        }
+        
+        @keyframes moveBackground {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .login-logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-body {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #444;
+            font-size: 14px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            z-index: 2;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 14px 14px 14px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            background: #f8f9fa;
+        }
+        
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            background: white;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .login-button:hover::before {
+            left: 100%;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-button:active {
+            transform: translateY(-1px);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 25px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .alert.error {
+            background-color: #ffe6e6;
+            color: #d32f2f;
+            border: 2px solid #ffcdd2;
+        }
+        
+        .alert.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+        
+        /* Demo login button */
+        .demo-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 176, 155, 0.3);
+        }
+        
+        /* Main Application Styles */
+        .app-container {
+            width: 100%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: none;
+        }
+        
+        .app-header {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #1a237e;
+            font-weight: bold;
+            font-size: 22px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: #667eea;
+        }
+        
+        .user-info {
+            font-size: 14px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info i {
+            color: #667eea;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logout-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.3);
+        }
+        
+        .main-nav {
+            background: white;
+            border-bottom: 2px solid #eef2f7;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .nav-tabs {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            gap: 2px;
+        }
+        
+        .nav-tab {
+            padding: 18px 30px;
+            color: #666;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-tab:hover {
+            background: #f8f9fa;
+            color: #283593;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 30px;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: none;
+            animation: contentSlide 0.4s ease;
+        }
+        
+        @keyframes contentSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .panel-estimation {
+            padding: 40px;
+        }
+        
+        .estimation-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .estimation-header h3 {
+            color: #283593;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .estimation-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .estimation-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+        }
+        
+        .config-sidebar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #eef2f7;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .config-group {
+            margin-bottom: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #eef2f7;
+        }
+        
+        .config-group h4 {
+            color: #283593;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+        
+        .config-item {
+            margin-bottom: 20px;
+        }
+        
+        .config-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .config-item label span {
+            color: #888;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .config-item select,
+        .config-item input,
+        .config-item textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .config-item textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .config-item select:focus,
+        .config-item input:focus,
+        .config-item textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .multi-level-section {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px dashed #b8c4ff;
+            display: none;
+        }
+        
+        .multi-level-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .add-level-btn,
+        .remove-level-btn {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .remove-level-btn {
+            background: #ff6b6b;
+        }
+        
+        .custom-panel-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px dashed #b3d9ff;
+            display: none;
+        }
+        
+        .add-component-btn {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .custom-component-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .component-specs {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .spec-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .add-spec-btn {
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 176, 155, 0.3);
+        }
+        
+        .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .bom-content {
+            padding: 35px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #eef2f7;
+        }
+        
+        .bom-section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bom-section h4 {
+            color: #283593;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #eef2f7;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .bom-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .bom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .bom-table thead {
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+        }
+        
+        .bom-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+        
+        .bom-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        
+        .bom-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .bom-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .bom-table tr:nth-child(even):hover {
+            background: #f0f4ff;
+        }
+        
+        .cost-summary {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+            padding: 35px;
+            border-radius: 12px;
+            border: 3px solid #eef2f7;
+            margin-top: 40px;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .cost-summary h4 {
+            color: #283593;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .price-bid-table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-size: 13px;
+        }
+        
+        .price-bid-table thead {
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+        }
+        
+        .price-bid-table th {
+            padding: 14px 10px;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+            border: 1px solid #ddd;
+        }
+        
+        .price-bid-table td {
+            padding: 12px 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            background: white;
+        }
+        
+        .price-bid-table tbody tr:nth-child(even) td {
+            background: #f9f9f9;
+        }
+        
+        .price-bid-table .subtotal-row td {
+            background: #e8f5e9 !important;
+            font-weight: bold;
+            color: #155724;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .price-bid-table .gst-row td {
+            background: #f8f9fa !important;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .price-bid-table .grandtotal-row td {
+            background: #d4edda !important;
+            font-weight: bold;
+            color: #155724;
+            font-size: 16px;
+            border-top: 2px solid #155724;
+            text-align: right;
+        }
+        
+        .price-bid-table .indented-row td {
+            padding-left: 30px;
+            text-align: left;
+        }
+        
+        .price-bid-table .main-item {
+            font-weight: bold;
+            background: #f0f8ff;
+        }
+        
+        .customer-section {
+            margin-top: 40px;
+            padding: 35px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            border-radius: 12px;
+            border: 2px solid #eef2f7;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .customer-section h4 {
+            color: #283593;
+            margin-bottom: 25px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .customer-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .customer-form .form-group {
+            margin-bottom: 0;
+        }
+        
+        .customer-form .full-width {
+            grid-column: span 2;
+        }
+        
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .success-message {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #d4edda 0%, #c8e6c9 100%);
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            color: #155724;
+            animation: bounceIn 0.6s ease;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quotation-history {
+            padding: 40px;
+        }
+        
+        .history-header {
+            margin-bottom: 40px;
+        }
+        
+        .history-header h3 {
+            color: #283593;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .history-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .history-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 2px solid #eef2f7;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        .history-table thead {
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+        }
+        
+        .history-table th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+        
+        .history-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        
+        .history-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-primary {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .badge-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .components-database {
+            padding: 40px;
+        }
+        
+        .components-header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .components-header h3 {
+            color: #283593;
+            font-size: 28px;
+            margin-bottom: 0;
+        }
+        
+        .add-component-form {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #eef2f7;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .add-component-form.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            margin: 40px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            animation: modalSlide 0.4s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 20px 20px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        .modal-body {
+            padding: 40px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        @media (max-width: 1200px) {
+            .estimation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .config-sidebar {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            
+            .form-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .customer-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .customer-form .full-width {
+                grid-column: span 1;
+            }
+            
+            .form-actions {
+                grid-column: span 1;
+                flex-direction: column;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+            
+            .nav-tab.active {
+                border-radius: 8px;
+            }
+            
+            .nav-tab.active::after {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .components-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h1 class="login-title">AMPRISE PANELS</h1>
+            <p class="login-subtitle">Advanced Panel Estimation System</p>
+        </div>
+        <div class="login-body">
+            <div id="loginAlert" class="alert"></div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+            </div>
+            <button class="login-button" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i>
+                Login to Dashboard
+            </button>
+            <button class="demo-button" onclick="demoLogin()">
+                <i class="fas fa-rocket"></i>
+                Demo Login (Quick Access)
+            </button>
+        </div>
+        <div class="login-footer">
+            © 2024 AMPRISE PANELS PRIVATE LIMITED. All rights reserved.
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">
+                        <i class="fas fa-industry"></i>
+                        <span>AMPRISE PANELS</span>
+                    </div>
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="currentUser">User</span>
+                        <span>•</span>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab(event, 'estimation')">
+                    <i class="fas fa-calculator"></i> Panel Estimation
+                </button>
+                <button class="nav-tab" onclick="showTab(event, 'history')">
+                    <i class="fas fa-history"></i> Quotation History
+                </button>
+                <button class="nav-tab" onclick="showTab(event, 'components')">
+                    <i class="fas fa-database"></i> Component Database
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Panel Estimation Tab -->
+            <div id="estimationTab" class="tab-content active">
+                <div class="panel-estimation">
+                    <div class="estimation-header">
+                        <h3><i class="fas fa-cogs"></i> Panel Configuration & Estimation</h3>
+                        <p>Configure your panel specifications and generate detailed BOM with cost estimation</p>
+                    </div>
+                    
+                    <div class="estimation-grid">
+                        <!-- Configuration Sidebar -->
+                        <div class="config-sidebar">
+                            <div class="config-group">
+                                <h4><i class="fas fa-sliders-h"></i> Panel Configuration</h4>
+                                
+                                <div class="config-item">
+                                    <label>Panel Type <span>Select panel type</span></label>
+                                    <select id="panelType" onchange="togglePanelOptions()">
+                                        <option value="">Select Panel Type</option>
+                                        <option value="MCC">Motor Control Center (MCC)</option>
+                                        <option value="PCC">Power Control Center (PCC)</option>
+                                        <option value="APFC">APFC Panel</option>
+                                        <option value="VFD">VFD Panel</option>
+                                        <option value="PLC">PLC Control Panel</option>
+                                        <option value="custom">Custom Panel</option>
+                                        <option value="multi">Multi-Level Panel</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="multiLevelSection" class="multi-level-section">
+                                    <div class="level-header">
+                                        <h5>Multi-Level Configuration</h5>
+                                        <button type="button" class="add-level-btn" onclick="addLevel()">
+                                            <i class="fas fa-plus"></i> Add Level
+                                        </button>
+                                    </div>
+                                    <div id="levelsContainer"></div>
+                                </div>
+                                
+                                <div id="customPanelSection" class="custom-panel-section">
+                                    <div class="level-header">
+                                        <h5>Custom Components</h5>
+                                        <button type="button" class="add-level-btn" onclick="addCustomComponent()">
+                                            <i class="fas fa-plus"></i> Add Component
+                                        </button>
+                                    </div>
+                                    <div id="customComponentsContainer"></div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Number of Feeders <span>Main outgoing circuits</span></label>
+                                    <input type="number" id="feederCount" min="1" max="200" value="4">
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Motor Count <span>Number of motors to control</span></label>
+                                    <input type="number" id="motorCount" min="0" max="100" value="1">
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Panel Name/Reference</label>
+                                    <input type="text" id="panelName" placeholder="Enter panel name/reference">
+                                </div>
+                            </div>
+
+                            <div class="config-group">
+                                <h4><i class="fas fa-tools"></i> Technical Specifications</h4>
+                                
+                                <div class="config-item">
+                                    <label>Panel Size</label>
+                                    <select id="panelSize">
+                                        <option value="600x600x200">Compact (600x600x200)</option>
+                                        <option value="800x800x300" selected>Standard (800x800x300)</option>
+                                        <option value="1000x1000x400">Large (1000x1000x400)</option>
+                                        <option value="1500x1000x400">Sub PDB (1500x1000x400)</option>
+                                        <option value="1600x1700x600">PDB (1600x1700x600)</option>
+                                        <option value="2100x2900x1000">PCC Cum APFC (2100x2900x1000)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Busbar Type</label>
+                                    <select id="busbarType">
+                                        <option value="copper" selected>Copper</option>
+                                        <option value="aluminum">Aluminum</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Brand Preference</label>
+                                    <select id="brandPreference">
+                                        <option value="schneider" selected>Schneider</option>
+                                        <option value="abb">ABB</option>
+                                        <option value="siemens">Siemens</option>
+                                        <option value="standard">Standard</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Incoming Supply</label>
+                                    <select id="incomingSupply">
+                                        <option value="415V-3P" selected>415V, 3 Phase, 50Hz</option>
+                                        <option value="400V-3P">400V, 3 Phase, 50Hz</option>
+                                        <option value="480V-3P">480V, 3 Phase, 60Hz</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Protection Degree (IP Rating)</label>
+                                    <select id="ipRating">
+                                        <option value="IP54">IP54 (Dust & Splash Protected)</option>
+                                        <option value="IP55" selected>IP55 (Dust & Water Jet Protected)</option>
+                                        <option value="IP65">IP65 (Dust Tight & Water Jet Protected)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <label>Special Requirements</label>
+                                    <textarea id="specialRequirements" placeholder="Enter any special requirements..."></textarea>
+                                </div>
+                            </div>
+
+                            <button id="generateBtn" class="generate-btn" onclick="generateEstimation()">
+                                <i class="fas fa-bolt"></i> Generate Estimation
+                            </button>
+                        </div>
+
+                        <!-- BOM and Results -->
+                        <div class="bom-content">
+                            <div id="loadingSpinner" class="spinner"></div>
+                            <div id="bomResult"></div>
+                            <div id="costSummary"></div>
+                            <div id="customerSection"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quotation History Tab -->
+            <div id="historyTab" class="tab-content">
+                <div class="quotation-history">
+                    <div class="history-header">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Quotation History</h3>
+                        <p>View and manage all generated quotations</p>
+                    </div>
+                    <div id="historyContent">
+                        <div class="spinner" id="historySpinner"></div>
+                        <div id="quotationsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Database Tab -->
+            <div id="componentsTab" class="tab-content">
+                <div class="components-database">
+                    <div class="components-header">
+                        <h3><i class="fas fa-boxes"></i> Component Database</h3>
+                        <button class="btn btn-success" onclick="toggleAddComponentForm()">
+                            <i class="fas fa-plus"></i> Add New Component
+                        </button>
+                    </div>
+                    
+                    <div id="addComponentForm" class="add-component-form">
+                        <h4><i class="fas fa-plus-circle"></i> Add New Component</h4>
+                        <div class="form-row">
+                            <div class="config-item">
+                                <label>Component Name</label>
+                                <input type="text" id="newComponentName" placeholder="Enter component name">
+                            </div>
+                            <div class="config-item">
+                                <label>Category</label>
+                                <select id="newComponentCategory">
+                                    <option value="">Select Category</option>
+                                    <option value="Circuit Breaker">Circuit Breaker</option>
+                                    <option value="Contactor">Contactor</option>
+                                    <option value="Protection">Protection</option>
+                                    <option value="Busbar">Busbar</option>
+                                    <option value="Controller">Controller</option>
+                                    <option value="Capacitor">Capacitor</option>
+                                    <option value="Enclosure">Enclosure</option>
+                                    <option value="Accessory">Accessory</option>
+                                    <option value="Meter">Meter</option>
+                                    <option value="Instrument">Instrument</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>Brand</label>
+                                <input type="text" id="newComponentBrand" placeholder="Enter brand">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="config-item">
+                                <label>Specifications</label>
+                                <input type="text" id="newComponentSpecs" placeholder="Enter specifications">
+                            </div>
+                            <div class="config-item">
+                                <label>Unit Price (₹)</label>
+                                <input type="number" id="newComponentPrice" placeholder="Enter unit price" min="0" step="0.01">
+                            </div>
+                            <div class="config-item">
+                                <label>Unit</label>
+                                <select id="newComponentUnit">
+                                    <option value="Pcs">Pieces</option>
+                                    <option value="Set">Set</option>
+                                    <option value="Meter">Meter</option>
+                                    <option value="Kg">Kilogram</option>
+                                    <option value="Roll">Roll</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-success" onclick="saveNewComponent()">
+                                <i class="fas fa-save"></i> Save Component
+                            </button>
+                            <button class="btn btn-secondary" onclick="toggleAddComponentForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="componentsContent">
+                        <div class="spinner" id="componentsSpinner"></div>
+                        <div id="componentsList"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Quotation Details -->
+    <div id="quotationModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quotation Details</h3>
+                <button class="close-modal" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentUser = null;
+        let currentBOM = null;
+        let panelLevels = [];
+        let customComponents = [];
+
+        // Component Database - Load from localStorage or initialize with defaults
+        let componentDatabase = JSON.parse(localStorage.getItem('componentDatabase')) || {
+            // Circuit Breakers
+            'MCCB-630': { name: 'MCCB 630A', category: 'Circuit Breaker', brand: 'Schneider', 
+                         specifications: '630A, 415V, 4P, 65kA', unit_price: 8500, unit: 'Pcs' },
+            'MCCB-250': { name: 'MCCB 250A', category: 'Circuit Breaker', brand: 'ABB', 
+                         specifications: '250A, 415V, 3P, 50kA', unit_price: 6500, unit: 'Pcs' },
+            'MCB-32': { name: 'MCB 32A', category: 'Circuit Breaker', brand: 'Legrand', 
+                       specifications: '32A, 240V, SPN, 10kA', unit_price: 850, unit: 'Pcs' },
+            'MCB-63': { name: 'MCB 63A', category: 'Circuit Breaker', brand: 'Schneider', 
+                       specifications: '63A, 415V, 3P, 10kA', unit_price: 3200, unit: 'Pcs' },
+            
+            // Contactors
+            'CON-25': { name: 'Contactor 25A', category: 'Contactor', brand: 'Schneider', 
+                       specifications: '25A, 415V, 3P, AC3', unit_price: 1800, unit: 'Pcs' },
+            'CON-40': { name: 'Contactor 40A', category: 'Contactor', brand: 'ABB', 
+                       specifications: '40A, 415V, 3P, AC3', unit_price: 2500, unit: 'Pcs' },
+            'CON-100': { name: 'Contactor 100A', category: 'Contactor', brand: 'Siemens', 
+                        specifications: '100A, 415V, 3P, AC3', unit_price: 5800, unit: 'Pcs' },
+            
+            // Protection Devices
+            'OL-25': { name: 'Overload Relay', category: 'Protection', brand: 'Schneider', 
+                      specifications: '18-25A, Adjustable, Thermal', unit_price: 2200, unit: 'Pcs' },
+            'OL-40': { name: 'Overload Relay', category: 'Protection', brand: 'ABB', 
+                      specifications: '30-40A, Adjustable, Thermal', unit_price: 2800, unit: 'Pcs' },
+            'MP-25': { name: 'Motor Protection Relay', category: 'Protection', brand: 'Siemens', 
+                      specifications: '25A, Digital, 3 Phase', unit_price: 4500, unit: 'Pcs' },
+            
+            // Busbars
+            'BUS-CU-630': { name: 'Copper Busbar 630A', category: 'Busbar', brand: 'Standard', 
+                           specifications: 'Copper, 630A, 4P', unit_price: 12000, unit: 'Set' },
+            'BUS-AL-630': { name: 'Aluminum Busbar 630A', category: 'Busbar', brand: 'Standard', 
+                           specifications: 'Aluminum, 630A, 4P', unit_price: 8000, unit: 'Set' },
+            'BUS-CU-800': { name: 'Copper Busbar 800A', category: 'Busbar', brand: 'Standard', 
+                           specifications: 'Copper, 800A, 4P', unit_price: 15000, unit: 'Set' },
+            'BUS-CU-1000': { name: 'Copper Busbar 1000A', category: 'Busbar', brand: 'Standard', 
+                            specifications: 'Copper, 1000A, 4P', unit_price: 20000, unit: 'Set' },
+            
+            // Controllers
+            'APFC-CTRL': { name: 'APFC Controller', category: 'Controller', brand: 'Schneider', 
+                         specifications: 'Digital, 12 Step, RS485', unit_price: 12000, unit: 'Pcs' },
+            'PLC-BASIC': { name: 'PLC Basic Unit', category: 'Controller', brand: 'Siemens', 
+                         specifications: '24VDC, 14DI/10DO', unit_price: 18000, unit: 'Pcs' },
+            'VFD-22KW': { name: 'VFD 22kW', category: 'Controller', brand: 'ABB', 
+                         specifications: '22kW, 415V, 3P, IP55', unit_price: 25000, unit: 'Pcs' },
+            
+            // Capacitors
+            'CAP-25': { name: 'Capacitor 25kVAR', category: 'Capacitor', brand: 'Standard', 
+                       specifications: '25kVAR, 440V, Dry Type', unit_price: 8500, unit: 'Pcs' },
+            'CAP-15': { name: 'Capacitor 15kVAR', category: 'Capacitor', brand: 'Standard', 
+                       specifications: '15kVAR, 440V, Dry Type', unit_price: 6500, unit: 'Pcs' },
+            'CAP-50': { name: 'Capacitor 50kVAR', category: 'Capacitor', brand: 'Standard', 
+                       specifications: '50kVAR, 440V, Dry Type', unit_price: 12000, unit: 'Pcs' },
+            
+            // Enclosures
+            'ENC-600': { name: 'Enclosure IP55 600x600x200', category: 'Enclosure', brand: 'Standard', 
+                        specifications: 'CRCA, Powder Coated, Wall Mount', unit_price: 15000, unit: 'Pcs' },
+            'ENC-800': { name: 'Enclosure IP55 800x800x300', category: 'Enclosure', brand: 'Standard', 
+                        specifications: 'CRCA, Powder Coated, Floor Standing', unit_price: 18000, unit: 'Pcs' },
+            'ENC-1000': { name: 'Enclosure IP55 1000x1000x400', category: 'Enclosure', brand: 'Standard', 
+                         specifications: 'CRCA, Powder Coated, Floor Standing', unit_price: 22000, unit: 'Pcs' },
+            'ENC-1500': { name: 'Enclosure IP55 1500x1000x400', category: 'Enclosure', brand: 'Standard', 
+                         specifications: '1.6mm CRCA, Indoor Type', unit_price: 35000, unit: 'Pcs' },
+            'ENC-1600': { name: 'Enclosure IP55 1600x1700x600', category: 'Enclosure', brand: 'Standard', 
+                         specifications: '1.6mm CRCA, Indoor Type', unit_price: 45000, unit: 'Pcs' },
+            'ENC-2100': { name: 'Enclosure IP55 2100x2900x1000', category: 'Enclosure', brand: 'Standard', 
+                         specifications: '1.6mm CRCA, Indoor Type', unit_price: 75000, unit: 'Pcs' },
+            
+            // Accessories
+            'TB-10': { name: 'Terminal Block', category: 'Accessory', brand: 'Phoenix', 
+                      specifications: '10A, 600V, Screw Type', unit_price: 45, unit: 'Pcs' },
+            'TB-20': { name: 'Terminal Block', category: 'Accessory', brand: 'Phoenix', 
+                      specifications: '20A, 600V, Screw Type', unit_price: 65, unit: 'Pcs' },
+            'WIRE-1.5': { name: 'FRLS Wire 1.5sqmm', category: 'Accessory', brand: 'Finolex', 
+                         specifications: '1.5sqmm, FRLS, Copper', unit_price: 85, unit: 'Meter' },
+            'WIRE-2.5': { name: 'FRLS Wire 2.5sqmm', category: 'Accessory', brand: 'Finolex', 
+                         specifications: '2.5sqmm, FRLS, Copper', unit_price: 120, unit: 'Meter' },
+            'WIRE-4.0': { name: 'FRLS Wire 4.0sqmm', category: 'Accessory', brand: 'Finolex', 
+                         specifications: '4.0sqmm, FRLS, Copper', unit_price: 180, unit: 'Meter' },
+            'LAMP-LED': { name: 'Indication Lamp LED', category: 'Accessory', brand: 'Legrand', 
+                         specifications: 'LED, 220V, 22mm', unit_price: 280, unit: 'Pcs' },
+            'PB-22': { name: 'Push Button 22mm', category: 'Accessory', brand: 'Legrand', 
+                      specifications: '22mm, IP55, Red/Green', unit_price: 320, unit: 'Pcs' },
+            'SELECTOR': { name: 'Selector Switch', category: 'Accessory', brand: 'Schneider', 
+                         specifications: '22mm, 3 Position, IP55', unit_price: 450, unit: 'Pcs' },
+            
+            // Meters
+            'MTR-MULTI': { name: 'Multi-function Meter', category: 'Meter', brand: 'ABB', 
+                          specifications: '3 Phase, 4 Wire, RS485', unit_price: 8500, unit: 'Pcs' },
+            'MTR-ENERGY': { name: 'Energy Meter', category: 'Meter', brand: 'L&T', 
+                           specifications: 'Class 1, 3 Phase', unit_price: 6500, unit: 'Pcs' },
+            'MTR-POWER': { name: 'Power Factor Meter', category: 'Meter', brand: 'Schneider', 
+                          specifications: 'Digital, 96x96mm', unit_price: 4500, unit: 'Pcs' },
+            
+            // CTs
+            'CT-600': { name: 'Current Transformer 600/5A', category: 'Instrument', brand: 'L&T', 
+                       specifications: '600/5A, Class 1, 5VA', unit_price: 1800, unit: 'Pcs' },
+            'CT-800': { name: 'Current Transformer 800/5A', category: 'Instrument', brand: 'ABB', 
+                       specifications: '800/5A, Class 0.5, 10VA', unit_price: 2500, unit: 'Pcs' },
+            'CT-SET': { name: 'CT Set (3P+1N)', category: 'Instrument', brand: 'Standard', 
+                       specifications: '3 Phase + Neutral, 600/5A', unit_price: 7500, unit: 'Set' }
+        };
+
+        // Save component database to localStorage
+        function saveComponentDatabase() {
+            localStorage.setItem('componentDatabase', JSON.stringify(componentDatabase));
+        }
+
+        // ========== LOGIN FUNCTIONS ==========
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginAlert = document.getElementById('loginAlert');
+
+            if (!username || !password) {
+                showAlert(loginAlert, 'Please enter both username and password', 'error');
+                return;
+            }
+
+            // SUPPORTED USERS WITH CORRECT CREDENTIALS
+            const validUsers = {
+                'admin': { password: 'admin123', role: 'admin', name: 'Administrator' },
+                'engineer': { password: 'admin123', role: 'engineer', name: 'Estimation Engineer' },
+                'sales': { password: 'admin123', role: 'sales', name: 'Sales Executive' },
+                'manager': { password: 'admin123', role: 'manager', name: 'Operations Manager' }
+            };
+
+            if (validUsers[username] && validUsers[username].password === password) {
+                currentUser = {
+                    id: 1,
+                    username: username,
+                    role: validUsers[username].role,
+                    name: validUsers[username].name,
+                    fullName: validUsers[username].name
+                };
+                
+                document.querySelector('.login-container').style.display = 'none';
+                document.querySelector('.app-container').style.display = 'block';
+                
+                const roleBadge = currentUser.role === 'admin' ? ' (Administrator)' : 
+                                 currentUser.role === 'manager' ? ' (Manager)' : 
+                                 currentUser.role === 'sales' ? ' (Sales)' : ' (Engineer)';
+                
+                document.getElementById('currentUser').textContent = `Welcome, ${currentUser.name}${roleBadge}`;
+                updateCurrentDate();
+                
+                showAlert(loginAlert, `Login Successful! Logged in as ${currentUser.role}.`, 'success');
+                
+                loadComponents();
+                loadQuotations();
+            } else {
+                let errorMsg = 'Invalid username or password.';
+                if (!validUsers[username]) {
+                    errorMsg = 'User not found. Available users: admin, engineer, sales, manager (password: admin123)';
+                }
+                showAlert(loginAlert, errorMsg, 'error');
+            }
+        }
+
+        function demoLogin() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            login();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.querySelector('.login-container').style.display = 'block';
+            document.querySelector('.app-container').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // ========== TAB FUNCTIONS ==========
+        function showTab(event, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            if (tabName === 'history') {
+                loadQuotations();
+            }
+            
+            if (tabName === 'components') {
+                loadComponents();
+            }
+        }
+
+        // ========== PANEL CONFIGURATION FUNCTIONS ==========
+        function togglePanelOptions() {
+            const panelType = document.getElementById('panelType').value;
+            const multiLevelSection = document.getElementById('multiLevelSection');
+            const customPanelSection = document.getElementById('customPanelSection');
+            
+            multiLevelSection.style.display = 'none';
+            customPanelSection.style.display = 'none';
+            panelLevels = [];
+            customComponents = [];
+            
+            if (panelType === 'multi') {
+                multiLevelSection.style.display = 'block';
+                initializeMultiLevel();
+            } else if (panelType === 'custom') {
+                customPanelSection.style.display = 'block';
+                initializeCustomPanel();
+            }
+        }
+
+        function initializeMultiLevel() {
+            document.getElementById('levelsContainer').innerHTML = '';
+            panelLevels = [];
+            addLevel();
+        }
+
+        function addLevel() {
+            const levelId = panelLevels.length + 1;
+            panelLevels.push({
+                id: levelId,
+                name: `Level ${levelId}`,
+                type: 'MCC',
+                feederCount: 4,
+                motorCount: 1
+            });
+            renderLevels();
+        }
+
+        function removeLevel(levelId) {
+            panelLevels = panelLevels.filter(level => level.id !== levelId);
+            renderLevels();
+        }
+
+        function renderLevels() {
+            const container = document.getElementById('levelsContainer');
+            container.innerHTML = '';
+            
+            panelLevels.forEach(level => {
+                container.innerHTML += `
+                    <div class="multi-level-item">
+                        <div class="level-header">
+                            <h5>${level.name}</h5>
+                            <button type="button" class="remove-level-btn" onclick="removeLevel(${level.id})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                        <div class="config-item">
+                            <label>Level Type</label>
+                            <select onchange="updateLevel(${level.id}, 'type', this.value)">
+                                <option value="MCC" ${level.type === 'MCC' ? 'selected' : ''}>MCC</option>
+                                <option value="PCC" ${level.type === 'PCC' ? 'selected' : ''}>PCC</option>
+                                <option value="APFC" ${level.type === 'APFC' ? 'selected' : ''}>APFC</option>
+                                <option value="VFD" ${level.type === 'VFD' ? 'selected' : ''}>VFD</option>
+                                <option value="PLC" ${level.type === 'PLC' ? 'selected' : ''}>PLC</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>Feeders in this Level</label>
+                            <input type="number" value="${level.feederCount}" min="1" max="50" 
+                                   onchange="updateLevel(${level.id}, 'feederCount', this.value)">
+                        </div>
+                        <div class="config-item">
+                            <label>Motors in this Level</label>
+                            <input type="number" value="${level.motorCount}" min="0" max="20"
+                                   onchange="updateLevel(${level.id}, 'motorCount', this.value)">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateLevel(levelId, property, value) {
+            const level = panelLevels.find(l => l.id === levelId);
+            if (level) {
+                level[property] = property === 'feederCount' || property === 'motorCount' ? parseInt(value) : value;
+            }
+        }
+
+        function initializeCustomPanel() {
+            document.getElementById('customComponentsContainer').innerHTML = '';
+            customComponents = [];
+            addCustomComponent();
+        }
+
+        function addCustomComponent() {
+            const componentId = customComponents.length + 1;
+            customComponents.push({
+                id: componentId,
+                name: `Custom Component ${componentId}`,
+                category: 'Custom',
+                brand: 'Standard',
+                specifications: 'Custom specifications',
+                quantity: 1,
+                unit_price: 1000
+            });
+            renderCustomComponents();
+        }
+
+        function removeCustomComponent(componentId) {
+            customComponents = customComponents.filter(comp => comp.id !== componentId);
+            renderCustomComponents();
+        }
+
+        function renderCustomComponents() {
+            const container = document.getElementById('customComponentsContainer');
+            container.innerHTML = '';
+            
+            customComponents.forEach(comp => {
+                container.innerHTML += `
+                    <div class="custom-component-item">
+                        <div class="level-header">
+                            <h5>${comp.name}</h5>
+                            <button type="button" class="remove-level-btn" onclick="removeCustomComponent(${comp.id})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                        <div class="config-item">
+                            <label>Component Name</label>
+                            <input type="text" value="${comp.name}" onchange="updateCustomComponent(${comp.id}, 'name', this.value)">
+                        </div>
+                        <div class="config-item">
+                            <label>Category</label>
+                            <select onchange="updateCustomComponent(${comp.id}, 'category', this.value)">
+                                <option value="Custom" ${comp.category === 'Custom' ? 'selected' : ''}>Custom</option>
+                                <option value="Circuit Breaker" ${comp.category === 'Circuit Breaker' ? 'selected' : ''}>Circuit Breaker</option>
+                                <option value="Controller" ${comp.category === 'Controller' ? 'selected' : ''}>Controller</option>
+                                <option value="Accessory" ${comp.category === 'Accessory' ? 'selected' : ''}>Accessory</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>Brand</label>
+                            <input type="text" value="${comp.brand}" onchange="updateCustomComponent(${comp.id}, 'brand', this.value)">
+                        </div>
+                        <div class="config-item">
+                            <label>Quantity</label>
+                            <input type="number" value="${comp.quantity}" min="1" onchange="updateCustomComponent(${comp.id}, 'quantity', this.value)">
+                        </div>
+                        <div class="config-item">
+                            <label>Unit Price (₹)</label>
+                            <input type="number" value="${comp.unit_price}" min="0" step="0.01" onchange="updateCustomComponent(${comp.id}, 'unit_price', this.value)">
+                        </div>
+                        <div class="component-specs">
+                            <label>Specifications</label>
+                            <textarea onchange="updateCustomComponent(${comp.id}, 'specifications', this.value)" rows="2">${comp.specifications}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateCustomComponent(componentId, property, value) {
+            const comp = customComponents.find(c => c.id === componentId);
+            if (comp) {
+                if (property === 'quantity' || property === 'unit_price') {
+                    comp[property] = parseFloat(value);
+                } else {
+                    comp[property] = value;
+                }
+            }
+        }
+
+        // ========== GENERATE ESTIMATION ==========
+        function generateEstimation() {
+            const panelType = document.getElementById('panelType').value;
+            const feederCount = parseInt(document.getElementById('feederCount').value) || 4;
+            const motorCount = parseInt(document.getElementById('motorCount').value) || 1;
+            const panelSize = document.getElementById('panelSize').value;
+            const busbarType = document.getElementById('busbarType').value;
+            const brandPreference = document.getElementById('brandPreference').value;
+            const incomingSupply = document.getElementById('incomingSupply').value;
+            const ipRating = document.getElementById('ipRating').value;
+            const specialRequirements = document.getElementById('specialRequirements').value;
+            const panelName = document.getElementById('panelName').value.trim() || `${panelType} Panel`;
+
+            if (!panelType) {
+                alert('Please select a panel type');
+                return;
+            }
+
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('bomResult').innerHTML = '';
+            document.getElementById('costSummary').innerHTML = '';
+            document.getElementById('customerSection').innerHTML = '';
+
+            setTimeout(() => {
+                const bomData = calculateBOM(panelType, feederCount, motorCount, panelSize, busbarType, 
+                                            brandPreference, incomingSupply, ipRating, panelLevels, customComponents);
+                const costData = calculateCosts(bomData);
+                
+                currentBOM = {
+                    panelType: panelType,
+                    panelName: panelName,
+                    feederCount: feederCount,
+                    motorCount: motorCount,
+                    panelSize: panelSize,
+                    busbarType: busbarType,
+                    brandPreference: brandPreference,
+                    incomingSupply: incomingSupply,
+                    ipRating: ipRating,
+                    specialRequirements: specialRequirements,
+                    bomItems: bomData.bomItems,
+                    costBreakdown: costData
+                };
+                
+                displayBOM(currentBOM);
+                displayCostSummary(currentBOM);
+                displayCustomerSection();
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }, 1000);
+        }
+
+        function calculateBOM(panelType, feederCount, motorCount, panelSize, busbarType, brandPreference, incomingSupply, ipRating, levels, customComps) {
+            const bomItems = [];
+            
+            if (panelType === 'multi' && levels && levels.length > 0) {
+                levels.forEach(level => {
+                    const levelBom = generateLevelBOM(level.type, level.feederCount, level.motorCount, busbarType, brandPreference, panelSize, ipRating);
+                    bomItems.push(...levelBom);
+                });
+            } else {
+                if (panelType === 'custom') {
+                    customComps.forEach(comp => {
+                        bomItems.push({
+                            name: comp.name,
+                            category: comp.category,
+                            brand: comp.brand,
+                            specifications: comp.specifications,
+                            quantity: comp.quantity,
+                            unit_price: comp.unit_price,
+                            unit: 'Pcs'
+                        });
+                    });
+                } else {
+                    const standardBom = generateStandardBOM(panelType, feederCount, motorCount, busbarType, brandPreference, panelSize, ipRating);
+                    bomItems.push(...standardBom);
+                }
+            }
+            
+            addCommonComponents(bomItems, panelSize, ipRating, feederCount, motorCount, incomingSupply);
+            return { bomItems: bomItems };
+        }
+
+        function generateStandardBOM(panelType, feederCount, motorCount, busbarType, brandPreference, panelSize, ipRating) {
+            const bomItems = [];
+            
+            let enclosureKey = 'ENC-800';
+            if (panelSize === '600x600x200') enclosureKey = 'ENC-600';
+            else if (panelSize === '1000x1000x400') enclosureKey = 'ENC-1000';
+            else if (panelSize === '1500x1000x400') enclosureKey = 'ENC-1500';
+            else if (panelSize === '1600x1700x600') enclosureKey = 'ENC-1600';
+            else if (panelSize === '2100x2900x1000') enclosureKey = 'ENC-2100';
+            
+            bomItems.push({
+                name: `Enclosure ${ipRating} ${panelSize}`,
+                category: 'Enclosure',
+                brand: 'Standard',
+                specifications: `1.6mm CRCA, Indoor Type, ${ipRating}`,
+                quantity: 1,
+                unit_price: componentDatabase[enclosureKey]?.unit_price || 18000,
+                unit: 'Pcs'
+            });
+            
+            switch(panelType) {
+                case 'APFC':
+                    bomItems.push({
+                        name: 'APFC Controller',
+                        category: 'Controller',
+                        brand: brandPreference,
+                        specifications: 'Digital, 12 Step, RS485',
+                        quantity: 1,
+                        unit_price: componentDatabase['APFC-CTRL']?.unit_price || 12000,
+                        unit: 'Pcs'
+                    });
+                    if (panelSize === '2100x2900x1000') {
+                        bomItems.push({
+                            name: 'Capacitor 50kVAR',
+                            category: 'Capacitor',
+                            brand: 'Standard',
+                            specifications: '50kVAR, 440V, Dry Type',
+                            quantity: 8,
+                            unit_price: componentDatabase['CAP-50']?.unit_price || 12000,
+                            unit: 'Pcs'
+                        });
+                    } else {
+                        bomItems.push({
+                            name: 'Capacitor 25kVAR',
+                            category: 'Capacitor',
+                            brand: 'Standard',
+                            specifications: '25kVAR, 440V, Dry Type',
+                            quantity: Math.max(2, Math.ceil(feederCount/3)),
+                            unit_price: componentDatabase['CAP-25']?.unit_price || 8500,
+                            unit: 'Pcs'
+                        });
+                    }
+                    break;
+                    
+                case 'VFD':
+                    bomItems.push({
+                        name: 'VFD 22kW',
+                        category: 'Controller',
+                        brand: brandPreference,
+                        specifications: '22kW, 415V, 3P, IP55',
+                        quantity: Math.max(1, motorCount),
+                        unit_price: componentDatabase['VFD-22KW']?.unit_price || 25000,
+                        unit: 'Pcs'
+                    });
+                    break;
+                    
+                case 'PLC':
+                    bomItems.push({
+                        name: 'PLC Basic Unit',
+                        category: 'Controller',
+                        brand: brandPreference,
+                        specifications: '24VDC, 14DI/10DO',
+                        quantity: 1,
+                        unit_price: componentDatabase['PLC-BASIC']?.unit_price || 18000,
+                        unit: 'Pcs'
+                    });
+                    break;
+            }
+            
+            let mccbSize = 'MCCB-630';
+            if (panelType === 'PCC' || panelSize === '2100x2900x1000') {
+                mccbSize = 'MCCB-250';
+            }
+            
+            bomItems.push({
+                name: componentDatabase[mccbSize]?.name || 'MCCB 630A',
+                category: 'Circuit Breaker',
+                brand: brandPreference,
+                specifications: componentDatabase[mccbSize]?.specifications || '630A, 415V, 4P, 65kA',
+                quantity: 1,
+                unit_price: componentDatabase[mccbSize]?.unit_price || 8500,
+                unit: 'Pcs'
+            });
+            
+            let busbarKey = 'BUS-CU-630';
+            if (panelSize === '1600x1700x600') {
+                busbarKey = 'BUS-CU-800';
+            } else if (panelSize === '2100x2900x1000') {
+                busbarKey = 'BUS-CU-1000';
+            }
+            if (busbarType === 'aluminum') {
+                busbarKey = busbarKey.replace('CU', 'AL');
+            }
+            
+            bomItems.push({
+                name: componentDatabase[busbarKey]?.name || 'Copper Busbar',
+                category: 'Busbar',
+                brand: 'Standard',
+                specifications: componentDatabase[busbarKey]?.specifications || 'Copper Busbar Set',
+                quantity: 1,
+                unit_price: componentDatabase[busbarKey]?.unit_price || 12000,
+                unit: 'Set'
+            });
+            
+            if (panelSize === '1600x1700x600' || panelSize === '2100x2900x1000') {
+                bomItems.push({
+                    name: 'Multi-function Meter',
+                    category: 'Meter',
+                    brand: brandPreference,
+                    specifications: '3 Phase, 4 Wire, RS485',
+                    quantity: 1,
+                    unit_price: componentDatabase['MTR-MULTI']?.unit_price || 8500,
+                    unit: 'Pcs'
+                });
+                
+                bomItems.push({
+                    name: 'CT Set (3P+1N)',
+                    category: 'Instrument',
+                    brand: 'Standard',
+                    specifications: '3 Phase + Neutral, 600/5A',
+                    quantity: 1,
+                    unit_price: componentDatabase['CT-SET']?.unit_price || 7500,
+                    unit: 'Set'
+                });
+            }
+            
+            const mccbCount = Math.ceil(feederCount * 0.4);
+            const mcbCount = feederCount - mccbCount;
+            
+            if (mccbCount > 0) {
+                bomItems.push({
+                    name: 'MCCB 63A',
+                    category: 'Circuit Breaker',
+                    brand: brandPreference,
+                    specifications: '63A, 415V, 3P, 10kA',
+                    quantity: mccbCount,
+                    unit_price: componentDatabase['MCB-63']?.unit_price || 3200,
+                    unit: 'Pcs'
+                });
+            }
+            
+            if (mcbCount > 0) {
+                bomItems.push({
+                    name: 'MCB 32A',
+                    category: 'Circuit Breaker',
+                    brand: brandPreference,
+                    specifications: '32A, 240V, SPN, 10kA',
+                    quantity: mcbCount,
+                    unit_price: componentDatabase['MCB-32']?.unit_price || 850,
+                    unit: 'Pcs'
+                });
+            }
+            
+            if (motorCount > 0) {
+                const contactorSize = motorCount <= 5 ? 'CON-25' : 'CON-40';
+                const overloadSize = motorCount <= 5 ? 'OL-25' : 'OL-40';
+                
+                bomItems.push({
+                    name: componentDatabase[contactorSize]?.name || 'Contactor 25A',
+                    category: 'Contactor',
+                    brand: brandPreference,
+                    specifications: componentDatabase[contactorSize]?.specifications || '25A, 415V, 3P, AC3',
+                    quantity: motorCount,
+                    unit_price: componentDatabase[contactorSize]?.unit_price || 1800,
+                    unit: 'Pcs'
+                });
+                
+                bomItems.push({
+                    name: componentDatabase[overloadSize]?.name || 'Overload Relay',
+                    category: 'Protection',
+                    brand: brandPreference,
+                    specifications: componentDatabase[overloadSize]?.specifications || '18-25A, Adjustable, Thermal',
+                    quantity: motorCount,
+                    unit_price: componentDatabase[overloadSize]?.unit_price || 2200,
+                    unit: 'Pcs'
+                });
+            }
+            
+            return bomItems;
+        }
+
+        function generateLevelBOM(levelType, feederCount, motorCount, busbarType, brandPreference, panelSize, ipRating) {
+            const levelBom = generateStandardBOM(levelType, feederCount, motorCount, busbarType, brandPreference, panelSize, ipRating);
+            levelBom.forEach(item => {
+                item.name = `${levelType} Level - ${item.name}`;
+            });
+            return levelBom;
+        }
+
+        function addCommonComponents(bomItems, panelSize, ipRating, feederCount, motorCount, incomingSupply) {
+            const terminalBlocksNeeded = (feederCount * 6) + (motorCount * 8) + 20;
+            bomItems.push({
+                name: 'Terminal Block',
+                category: 'Accessory',
+                brand: 'Phoenix',
+                specifications: '10A, 600V, Screw Type',
+                quantity: terminalBlocksNeeded,
+                unit_price: componentDatabase['TB-10']?.unit_price || 45,
+                unit: 'Pcs'
+            });
+            
+            let wireSize = '1.5';
+            let wirePriceKey = 'WIRE-1.5';
+            if (panelSize === '1600x1700x600') {
+                wireSize = '2.5';
+                wirePriceKey = 'WIRE-2.5';
+            } else if (panelSize === '2100x2900x1000') {
+                wireSize = '4.0';
+                wirePriceKey = 'WIRE-4.0';
+            }
+            
+            const wiringLength = 150 + (feederCount * 10) + (motorCount * 15);
+            bomItems.push({
+                name: `FRLS Wire ${wireSize}sqmm`,
+                category: 'Accessory',
+                brand: 'Finolex',
+                specifications: `${wireSize}sqmm, FRLS, Copper`,
+                quantity: wiringLength,
+                unit_price: componentDatabase[wirePriceKey]?.unit_price || 85,
+                unit: 'Meter'
+            });
+            
+            const controlWiringLength = 50 + (feederCount * 5) + (motorCount * 10);
+            bomItems.push({
+                name: 'FRLS Wire 1.5sqmm',
+                category: 'Accessory',
+                brand: 'Finolex',
+                specifications: '1.5sqmm, FRLS, Copper',
+                quantity: controlWiringLength,
+                unit_price: componentDatabase['WIRE-1.5']?.unit_price || 85,
+                unit: 'Meter'
+            });
+            
+            const lampCount = 6 + Math.ceil(feederCount/4) + motorCount;
+            bomItems.push({
+                name: 'Indication Lamp LED',
+                category: 'Accessory',
+                brand: 'Legrand',
+                specifications: 'LED, 220V, 22mm',
+                quantity: lampCount,
+                unit_price: componentDatabase['LAMP-LED']?.unit_price || 280,
+                unit: 'Pcs'
+            });
+            
+            const pbCount = motorCount * 2 + 2;
+            bomItems.push({
+                name: 'Push Button 22mm',
+                category: 'Accessory',
+                brand: 'Legrand',
+                specifications: '22mm, IP55, Red/Green',
+                quantity: pbCount,
+                unit_price: componentDatabase['PB-22']?.unit_price || 320,
+                unit: 'Pcs'
+            });
+            
+            if (motorCount > 0) {
+                bomItems.push({
+                    name: 'Selector Switch',
+                    category: 'Accessory',
+                    brand: 'Schneider',
+                    specifications: '22mm, 3 Position, IP55',
+                    quantity: motorCount,
+                    unit_price: componentDatabase['SELECTOR']?.unit_price || 450,
+                    unit: 'Pcs'
+                });
+            }
+        }
+
+        function calculateCosts(bomData) {
+            let materialCost = 0;
+            bomData.bomItems.forEach(item => {
+                materialCost += (item.quantity * item.unit_price);
+            });
+            
+            const powderCoatingCost = materialCost * 0.03;
+            const labourCost = materialCost * 0.20;
+            const wiringCost = materialCost * 0.15;
+            const testingCost = materialCost * 0.05;
+            const productionCost = powderCoatingCost + labourCost + wiringCost + testingCost;
+            
+            const totalCost = materialCost + productionCost;
+            const profitMargin = 20;
+            const priceBeforeGST = totalCost * (1 + profitMargin/100);
+            const gstPercentage = 18;
+            const gstAmount = priceBeforeGST * (gstPercentage/100);
+            const finalAmount = priceBeforeGST + gstAmount;
+            
+            return {
+                materialCost: parseFloat(materialCost.toFixed(2)),
+                productionCost: parseFloat(productionCost.toFixed(2)),
+                powderCoatingCost: parseFloat(powderCoatingCost.toFixed(2)),
+                labourCost: parseFloat(labourCost.toFixed(2)),
+                wiringCost: parseFloat(wiringCost.toFixed(2)),
+                testingCost: parseFloat(testingCost.toFixed(2)),
+                totalCost: parseFloat(totalCost.toFixed(2)),
+                profitMargin: profitMargin,
+                priceBeforeGST: parseFloat(priceBeforeGST.toFixed(2)),
+                gstPercentage: gstPercentage,
+                gstAmount: parseFloat(gstAmount.toFixed(2)),
+                finalAmount: parseFloat(finalAmount.toFixed(2))
+            };
+        }
+
+        function displayBOM(data) {
+            const container = document.getElementById('bomResult');
+            
+            const categories = {};
+            data.bomItems.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+            
+            let html = `
+                <div class="bom-section">
+                    <h4><i class="fas fa-list-alt"></i> Bill of Materials - ${data.panelName}</h4>
+                    <div class="bom-table-container">
+                        <table class="bom-table">
+                            <thead>
+                                <tr>
+                                    <th>Sr. No.</th>
+                                    <th>Component Name</th>
+                                    <th>Category</th>
+                                    <th>Specifications</th>
+                                    <th>Brand</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price (₹)</th>
+                                    <th>Total (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            let srNo = 1;
+            let incomerSectionAdded = false;
+            let outgoingSectionAdded = false;
+            
+            const incomerCategories = ['Circuit Breaker', 'Busbar', 'Controller', 'Capacitor', 'Meter', 'Instrument'];
+            for (const category of incomerCategories) {
+                if (categories[category]) {
+                    if (!incomerSectionAdded) {
+                        html += `
+                            <tr style="background: #f0f4ff;">
+                                <td colspan="8" style="font-weight: bold; color: #283593; padding: 12px 20px;">
+                                    <i class="fas fa-plug"></i> INCOMER SECTION
+                                </td>
+                            </tr>
+                        `;
+                        incomerSectionAdded = true;
+                    }
+                    
+                    categories[category].forEach(item => {
+                        const total = item.quantity * item.unit_price;
+                        html += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td style="font-weight: 500;">${item.name}</td>
+                                <td>${item.category}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${item.unit_price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                                <td>₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+            
+            const outgoingCategories = ['Contactor', 'Protection'];
+            for (const category of outgoingCategories) {
+                if (categories[category]) {
+                    if (!outgoingSectionAdded) {
+                        html += `
+                            <tr style="background: #f0f4ff;">
+                                <td colspan="8" style="font-weight: bold; color: #283593; padding: 12px 20px;">
+                                    <i class="fas fa-sitemap"></i> OUTGOING SECTION
+                                </td>
+                            </tr>
+                        `;
+                        outgoingSectionAdded = true;
+                    }
+                    
+                    categories[category].forEach(item => {
+                        const total = item.quantity * item.unit_price;
+                        html += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td style="font-weight: 500;">${item.name}</td>
+                                <td>${item.category}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${item.unit_price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                                <td>₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+            
+            const otherCategories = ['Enclosure', 'Accessory'];
+            let otherComponentsAdded = false;
+            
+            for (const category of otherCategories) {
+                if (categories[category]) {
+                    if (!otherComponentsAdded) {
+                        html += `
+                            <tr style="background: #f0f4ff;">
+                                <td colspan="8" style="font-weight: bold; color: #283593; padding: 12px 20px;">
+                                    <i class="fas fa-cube"></i> OTHER COMPONENTS
+                                </td>
+                            </tr>
+                        `;
+                        otherComponentsAdded = true;
+                    }
+                    
+                    categories[category].forEach(item => {
+                        const total = item.quantity * item.unit_price;
+                        html += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td style="font-weight: 500;">${item.name}</td>
+                                <td>${item.category}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${item.unit_price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                                <td>₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+            
+            if (categories['Custom']) {
+                html += `
+                    <tr style="background: #f0f4ff;">
+                        <td colspan="8" style="font-weight: bold; color: #283593; padding: 12px 20px;">
+                            <i class="fas fa-plus-circle"></i> CUSTOM COMPONENTS
+                        </td>
+                    </tr>
+                `;
+                
+                categories['Custom'].forEach(item => {
+                    const total = item.quantity * item.unit_price;
+                    html += `
+                        <tr>
+                            <td>${srNo++}</td>
+                            <td style="font-weight: 500;">${item.name}</td>
+                            <td>${item.category}</td>
+                            <td>${item.specifications || 'Custom specifications'}</td>
+                            <td>${item.brand}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${item.unit_price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                            <td>₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function displayCostSummary(data) {
+            const container = document.getElementById('costSummary');
+            const cost = data.costBreakdown;
+            
+            let html = `
+                <div class="cost-summary">
+                    <h4><i class="fas fa-money-bill-wave"></i> Price Bid</h4>
+                    <div class="bom-table-container">
+                        <table class="price-bid-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">SR NO.</th>
+                                    <th style="width: 45%;">Description</th>
+                                    <th style="width: 15%;">QTY/SET</th>
+                                    <th style="width: 15%;">RATE (₹)</th>
+                                    <th style="width: 20%;">AMOUNT (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            let srNo = 1;
+            let totalAmount = 0;
+            
+            if (data.panelType === 'multi' && panelLevels.length > 0) {
+                panelLevels.forEach((level, index) => {
+                    const levelCost = calculateLevelCost(level);
+                    
+                    html += `
+                        <tr class="main-item">
+                            <td>${srNo++}</td>
+                            <td>${level.type} PANEL, ENCLOSURE: ${data.panelSize}, ${data.ipRating}, INDOOR TYPE, WITH COMPLETE WIRING (AS PER DRAWING)</td>
+                            <td>1</td>
+                            <td>${formatCurrency(levelCost.enclosureCost)}</td>
+                            <td>${formatCurrency(levelCost.enclosureCost)}</td>
+                        </tr>
+                    `;
+                    totalAmount += levelCost.enclosureCost;
+                    
+                    html += `
+                        <tr class="indented-row">
+                            <td></td>
+                            <td>${level.type} PANEL'S SWITCHGEAR & METERING ITEMS (BOM ATTACHED)</td>
+                            <td></td>
+                            <td>${formatCurrency(levelCost.switchgearCost)}</td>
+                            <td>${formatCurrency(levelCost.switchgearCost)}</td>
+                        </tr>
+                    `;
+                    totalAmount += levelCost.switchgearCost;
+                });
+            } else {
+                const enclosureCost = cost.totalCost * 0.20;
+                const switchgearCost = cost.totalCost * 0.80;
+                
+                html += `
+                    <tr class="main-item">
+                        <td>${srNo++}</td>
+                        <td>${data.panelType} PANEL, ENCLOSURE: ${data.panelSize}, ${data.ipRating}, INDOOR TYPE, WITH COMPLETE WIRING (AS PER DRAWING)</td>
+                        <td>1</td>
+                        <td>${formatCurrency(enclosureCost)}</td>
+                        <td>${formatCurrency(enclosureCost)}</td>
+                    </tr>
+                `;
+                totalAmount += enclosureCost;
+                
+                html += `
+                    <tr class="indented-row">
+                        <td></td>
+                        <td>${data.panelType} PANEL'S SWITCHGEAR & METERING ITEMS (BOM ATTACHED)</td>
+                        <td></td>
+                        <td>${formatCurrency(switchgearCost)}</td>
+                        <td>${formatCurrency(switchgearCost)}</td>
+                    </tr>
+                `;
+                totalAmount += switchgearCost;
+            }
+            
+            html += `
+                <tr class="subtotal-row">
+                    <td colspan="4" style="text-align: right;">SUB TOTAL</td>
+                    <td>${formatCurrency(totalAmount)}</td>
+                </tr>
+            `;
+            
+            const gstAmount = totalAmount * (cost.gstPercentage/100);
+            html += `
+                <tr class="gst-row">
+                    <td colspan="4" style="text-align: right;">GST @ ${cost.gstPercentage}%</td>
+                    <td>${formatCurrency(gstAmount)}</td>
+                </tr>
+            `;
+            
+            const finalTotal = totalAmount + gstAmount;
+            html += `
+                <tr class="grandtotal-row">
+                    <td colspan="4" style="text-align: right;">GRAND TOTAL</td>
+                    <td>${formatCurrency(finalTotal)}</td>
+                </tr>
+            `;
+            
+            html += `
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 15px; font-style: italic; color: #666;">
+                            <strong>Amount in Words:</strong> ${numberToWords(Math.round(finalTotal))} only.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function groupPanelItems(data) {
+            const groups = {
+                enclosure: [],
+                switchgear: [],
+                metering: [],
+                accessories: []
+            };
+            
+            data.bomItems.forEach(item => {
+                if (item.category === 'Enclosure') {
+                    groups.enclosure.push(item);
+                } else if (item.category === 'Circuit Breaker' || item.category === 'Busbar' || 
+                          item.category === 'Contactor' || item.category === 'Protection') {
+                    groups.switchgear.push(item);
+                } else if (item.category === 'Meter' || item.category === 'Instrument') {
+                    groups.metering.push(item);
+                } else {
+                    groups.accessories.push(item);
+                }
+            });
+            
+            return groups;
+        }
+
+        function calculateLevelCost(level) {
+            let baseCost = 50000;
+            const costPerFeeder = 1500;
+            const costPerMotor = 8000;
+            
+            const materialCost = baseCost + (level.feederCount * costPerFeeder) + (level.motorCount * costPerMotor);
+            const productionCost = materialCost * 0.43;
+            const totalCost = materialCost + productionCost;
+            
+            const enclosureCost = totalCost * 0.20;
+            const switchgearCost = totalCost * 0.80;
+            
+            return {
+                enclosureCost: parseFloat(enclosureCost.toFixed(2)),
+                switchgearCost: parseFloat(switchgearCost.toFixed(2)),
+                totalCost: parseFloat(totalCost.toFixed(2))
+            };
+        }
+
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function displayCustomerSection() {
+            const container = document.getElementById('customerSection');
+            
+            container.innerHTML = `
+                <div class="customer-section">
+                    <h4><i class="fas fa-user-tie"></i> Create Quotation</h4>
+                    <div class="customer-form">
+                        <div class="form-group">
+                            <label>Customer Name *</label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter customer name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="customerPhone" class="form-control" placeholder="Enter phone number" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Address *</label>
+                            <textarea id="customerAddress" class="form-control" rows="2" placeholder="Enter complete address" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="customerEmail" class="form-control" placeholder="Enter email address">
+                        </div>
+                        <div class="form-group">
+                            <label>GST Number (Optional)</label>
+                            <input type="text" id="gstNumber" class="form-control" placeholder="Enter GST number">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="createQuotation()">
+                                <i class="fas fa-file-contract"></i> Create Quotation
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== QUOTATION FUNCTIONS ==========
+        function createQuotation() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const customerAddress = document.getElementById('customerAddress').value.trim();
+
+            if (!customerName || !customerPhone || !customerAddress) {
+                alert('Please enter customer name, phone number, and address');
+                return;
+            }
+
+            if (!currentBOM) {
+                alert('Please generate BOM first');
+                return;
+            }
+
+            const now = new Date();
+            const year = now.getFullYear();
+            
+            let quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            
+            let maxCounter = 0;
+            quotations.forEach(quote => {
+                if (quote.quotation_number) {
+                    const parts = quote.quotation_number.split('/');
+                    if (parts.length === 3 && parts[0] == year) {
+                        const counter = parseInt(parts[2]);
+                        if (!isNaN(counter) && counter > maxCounter) {
+                            maxCounter = counter;
+                        }
+                    }
+                }
+            });
+            
+            const quotationCounter = maxCounter + 1;
+            const quotationNumber = `${year}/QUO/${quotationCounter.toString().padStart(3, '0')}`;
+            
+            const bomItemsCopy = currentBOM.bomItems ? currentBOM.bomItems.map(item => ({
+                name: item.name || '',
+                category: item.category || '',
+                brand: item.brand || '',
+                specifications: item.specifications || '',
+                quantity: item.quantity || 0,
+                unit_price: item.unit_price || 0,
+                unit: item.unit || 'Pcs'
+            })) : [];
+            
+            const quotationData = {
+                id: Date.now(),
+                quotation_number: quotationNumber,
+                customerName: customerName,
+                customerAddress: customerAddress,
+                customerPhone: customerPhone,
+                customerEmail: document.getElementById('customerEmail').value.trim() || '',
+                gstNumber: document.getElementById('gstNumber').value.trim() || '',
+                panelType: currentBOM.panelType || '',
+                panelName: currentBOM.panelName || '',
+                feederCount: currentBOM.feederCount || 0,
+                motorCount: currentBOM.motorCount || 0,
+                panelSize: currentBOM.panelSize || '',
+                busbarType: currentBOM.busbarType || '',
+                brandPreference: currentBOM.brandPreference || '',
+                incomingSupply: currentBOM.incomingSupply || '',
+                ipRating: currentBOM.ipRating || '',
+                specialRequirements: currentBOM.specialRequirements || '',
+                bomItems: bomItemsCopy,
+                costBreakdown: currentBOM.costBreakdown ? {
+                    materialCost: currentBOM.costBreakdown.materialCost || 0,
+                    productionCost: currentBOM.costBreakdown.productionCost || 0,
+                    powderCoatingCost: currentBOM.costBreakdown.powderCoatingCost || 0,
+                    labourCost: currentBOM.costBreakdown.labourCost || 0,
+                    wiringCost: currentBOM.costBreakdown.wiringCost || 0,
+                    testingCost: currentBOM.costBreakdown.testingCost || 0,
+                    totalCost: currentBOM.costBreakdown.totalCost || 0,
+                    profitMargin: currentBOM.costBreakdown.profitMargin || 20,
+                    priceBeforeGST: currentBOM.costBreakdown.priceBeforeGST || 0,
+                    gstPercentage: currentBOM.costBreakdown.gstPercentage || 18,
+                    gstAmount: currentBOM.costBreakdown.gstAmount || 0,
+                    finalAmount: currentBOM.costBreakdown.finalAmount || 0
+                } : {
+                    materialCost: 0,
+                    productionCost: 0,
+                    powderCoatingCost: 0,
+                    labourCost: 0,
+                    wiringCost: 0,
+                    testingCost: 0,
+                    totalCost: 0,
+                    profitMargin: 20,
+                    priceBeforeGST: 0,
+                    gstPercentage: 18,
+                    gstAmount: 0,
+                    finalAmount: 0
+                },
+                created_at: now.toISOString(),
+                status: 'draft',
+                status_history: [{
+                    from: null,
+                    to: 'draft',
+                    by: currentUser?.username || 'System',
+                    by_role: currentUser?.role || 'System',
+                    timestamp: now.toISOString(),
+                    note: 'Quotation created'
+                }]
+            };
+
+            quotations.push(quotationData);
+            localStorage.setItem('quotations', JSON.stringify(quotations));
+            
+            const successHtml = `
+                <div class="success-message">
+                    <h5><i class="fas fa-check-circle"></i> Quotation Created Successfully!</h5>
+                    <p><strong>Quotation Number:</strong> ${quotationNumber}</p>
+                    <p><strong>Customer:</strong> ${customerName}</p>
+                    <p><strong>Total Amount:</strong> ₹${(quotationData.costBreakdown.finalAmount || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="viewQuotation(${quotationData.id})">
+                            <i class="fas fa-eye"></i> View Quotation
+                        </button>
+                        <button class="btn btn-success" onclick="printQuotation(${quotationData.id})">
+                            <i class="fas fa-print"></i> Print Quotation
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadQuotation(${quotationData.id})">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            const container = document.getElementById('customerSection');
+            const existingSuccess = container.querySelector('.success-message');
+            if (existingSuccess) existingSuccess.remove();
+            container.insertAdjacentHTML('afterbegin', successHtml);
+
+            loadQuotations();
+            alert('Quotation created successfully!');
+        }
+
+        function resetForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('gstNumber').value = '';
+            
+            const successMsg = document.querySelector('.success-message');
+            if (successMsg) successMsg.remove();
+        }
+
+        // ========== FIXED VIEW QUOTATION FUNCTION ==========
+        function viewQuotation(quotationId) {
+            const quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            const quotation = quotations.find(q => q.id === quotationId);
+            
+            if (!quotation) {
+                alert('Quotation not found');
+                return;
+            }
+
+            const modal = document.getElementById('quotationModal');
+            const modalBody = document.getElementById('modalBody');
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            
+            const statusHistory = quotation.status_history || [];
+            const currentStatus = quotation.status || 'draft';
+            
+            const totalAmount = quotation.costBreakdown?.finalAmount || 
+                               quotation.final_amount || 
+                               quotation.totalAmount || 0;
+            
+            const gstAmount = quotation.costBreakdown?.gstAmount || 
+                              (totalAmount * 18 / 118) || 0;
+            
+            modalBody.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div>
+                            <h4 style="color: #283593; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-file-invoice"></i> Quotation: ${quotation.quotation_number || 'N/A'}
+                                ${getStatusBadge(currentStatus)}
+                            </h4>
+                            <p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">
+                                Created: ${quotation.created_at ? new Date(quotation.created_at).toLocaleString('en-IN') : 'N/A'}
+                            </p>
+                        </div>
+                        ${isAdmin ? `
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="deleteQuotation(${quotation.id}, event)" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${isAdmin ? `
+                    <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
+                        <h5 style="color: #283593; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-tasks"></i> Quotation Status Management
+                        </h5>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                            <span style="font-weight: 600; color: #495057;">Change Status:</span>
+                            
+                            ${currentStatus !== 'sent' ? `
+                            <button onclick="updateQuotationStatus(${quotation.id}, 'sent', event)" 
+                                    class="btn" style="background: #17a2b8; color: white; padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-paper-plane"></i> Mark as Sent
+                            </button>
+                            ` : ''}
+                            
+                            ${currentStatus !== 'approved' ? `
+                            <button onclick="updateQuotationStatus(${quotation.id}, 'approved', event)" 
+                                    class="btn" style="background: #28a745; color: white; padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-check-circle"></i> Approve Quotation
+                            </button>
+                            ` : ''}
+                            
+                            ${currentStatus !== 'rejected' ? `
+                            <button onclick="updateQuotationStatus(${quotation.id}, 'rejected', event)" 
+                                    class="btn" style="background: #dc3545; color: white; padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-times-circle"></i> Reject Quotation
+                            </button>
+                            ` : ''}
+                            
+                            ${currentStatus !== 'draft' ? `
+                            <button onclick="updateQuotationStatus(${quotation.id}, 'draft', event)" 
+                                    class="btn" style="background: #6c757d; color: white; padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-undo"></i> Revert to Draft
+                            </button>
+                            ` : ''}
+                        </div>
+                        
+                        ${statusHistory.length > 0 ? `
+                        <div style="margin-top: 20px;">
+                            <p style="font-weight: 600; margin-bottom: 10px; color: #495057;">
+                                <i class="fas fa-history"></i> Status History:
+                            </p>
+                            <div style="max-height: 150px; overflow-y: auto; padding: 10px; background: white; border-radius: 5px;">
+                                ${statusHistory.slice().reverse().map(entry => `
+                                    <div style="padding: 8px; border-bottom: 1px solid #eee; font-size: 12px;">
+                                        <span style="display: inline-block; width: 80px; font-weight: 600;">${new Date(entry.timestamp).toLocaleDateString()}</span>
+                                        <span style="color: #6c757d;">${entry.from || 'N/A'}</span>
+                                        <i class="fas fa-arrow-right" style="margin: 0 10px; color: #6c757d;"></i>
+                                        <span style="color: ${entry.to === 'approved' ? '#28a745' : entry.to === 'rejected' ? '#dc3545' : '#17a2b8'}; font-weight: 600;">${entry.to}</span>
+                                        <span style="margin-left: 10px; color: #6c757d;">by ${entry.by || entry.by_role || 'System'}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h5 style="color: #283593; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-user"></i> Customer Details
+                            </h5>
+                            <p style="margin: 8px 0;"><strong>Name:</strong> ${quotation.customerName || quotation.customer_name || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>Address:</strong> ${quotation.customerAddress || quotation.customer_address || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>Phone:</strong> ${quotation.customerPhone || quotation.customer_phone || 'N/A'}</p>
+                            ${quotation.customerEmail ? `<p style="margin: 8px 0;"><strong>Email:</strong> ${quotation.customerEmail}</p>` : ''}
+                            ${quotation.gstNumber || quotation.gst_number ? `<p style="margin: 8px 0;"><strong>GST:</strong> ${quotation.gstNumber || quotation.gst_number}</p>` : ''}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h5 style="color: #283593; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-cogs"></i> Panel Specifications
+                            </h5>
+                            <p style="margin: 8px 0;"><strong>Panel Type:</strong> ${quotation.panelType || quotation.panel_type || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>Panel Name:</strong> ${quotation.panelName || quotation.panel_name || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>Panel Size:</strong> ${quotation.panelSize || quotation.panel_size || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>IP Rating:</strong> ${quotation.ipRating || quotation.ip_rating || 'IP55'}</p>
+                            <p style="margin: 8px 0;"><strong>Feeders:</strong> ${quotation.feederCount || quotation.number_of_feeders || 0}</p>
+                            <p style="margin: 8px 0;"><strong>Motors:</strong> ${quotation.motorCount || quotation.motor_count || 0}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h5 style="color: #283593; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-rupee-sign"></i> Financial Summary
+                        </h5>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                                <p style="color: #666; margin-bottom: 5px; font-size: 13px;">Material Cost</p>
+                                <p style="font-size: 20px; font-weight: bold; color: #283593; margin: 0;">
+                                    ₹${(quotation.costBreakdown?.materialCost || quotation.total_material_cost || 0).toLocaleString('en-IN')}
+                                </p>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                                <p style="color: #666; margin-bottom: 5px; font-size: 13px;">Production Cost</p>
+                                <p style="font-size: 20px; font-weight: bold; color: #283593; margin: 0;">
+                                    ₹${(quotation.costBreakdown?.productionCost || quotation.total_production_cost || 0).toLocaleString('en-IN')}
+                                </p>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                                <p style="color: #666; margin-bottom: 5px; font-size: 13px;">GST (18%)</p>
+                                <p style="font-size: 20px; font-weight: bold; color: #283593; margin: 0;">
+                                    ₹${gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                                </p>
+                            </div>
+                            <div style="background: #28a745; padding: 15px; border-radius: 8px; text-align: center;">
+                                <p style="color: white; margin-bottom: 5px; font-size: 13px;">TOTAL AMOUNT</p>
+                                <p style="font-size: 24px; font-weight: bold; color: white; margin: 0;">
+                                    ₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+                        <button onclick="printQuotation(${quotation.id})" class="btn btn-primary" style="padding: 12px 25px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-print"></i> Print Quotation
+                        </button>
+                        <button onclick="downloadQuotation(${quotation.id})" class="btn btn-success" style="padding: 12px 25px; background: #00b09b; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                        <button onclick="closeModal()" class="btn btn-secondary" style="padding: 12px 25px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        // ========== DELETE QUOTATION FUNCTION ==========
+        function deleteQuotation(quotationId, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            if (!currentUser) {
+                alert('❌ You must be logged in to perform this action');
+                return;
+            }
+            
+            if (currentUser.role !== 'admin') {
+                alert(`❌ Access Denied: Only Administrators can delete quotations.\n\nYour role: ${currentUser.role}\nRequired role: admin`);
+                return;
+            }
+            
+            let quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            const quotationToDelete = quotations.find(q => q.id === quotationId);
+            
+            if (!quotationToDelete) {
+                alert('❌ Quotation not found');
+                return;
+            }
+            
+            const confirmDelete = confirm(
+                `⚠️ DELETE QUOTATION ⚠️\n\n` +
+                `Quotation Number: ${quotationToDelete.quotation_number || 'N/A'}\n` +
+                `Customer: ${quotationToDelete.customerName || quotationToDelete.customer_name || 'N/A'}\n` +
+                `Date: ${quotationToDelete.created_at ? new Date(quotationToDelete.created_at).toLocaleDateString() : 'N/A'}\n` +
+                `Amount: ₹${(quotationToDelete.costBreakdown?.finalAmount || quotationToDelete.final_amount || 0).toLocaleString()}\n\n` +
+                `Are you sure you want to delete this quotation?\n\n` +
+                `This action CANNOT be undone!`
+            );
+            
+            if (!confirmDelete) {
+                return;
+            }
+            
+            try {
+                quotations = quotations.filter(q => q.id !== quotationId);
+                localStorage.setItem('quotations', JSON.stringify(quotations));
+                
+                alert(`✅ Quotation ${quotationToDelete.quotation_number || ''} deleted successfully`);
+                
+                loadQuotations();
+                closeModal();
+            } catch (error) {
+                console.error('Delete quotation error:', error);
+                alert('❌ Failed to delete quotation: ' + error.message);
+            }
+        }
+
+        function deleteAllQuotations() {
+            if (!currentUser) {
+                alert('❌ You must be logged in to perform this action');
+                return;
+            }
+            
+            if (currentUser.role !== 'admin') {
+                alert(`❌ Access Denied: Only Administrators can delete all quotations.\n\nYour role: ${currentUser.role}\nRequired role: admin`);
+                return;
+            }
+            
+            const quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            
+            if (quotations.length === 0) {
+                alert('No quotations to delete');
+                return;
+            }
+            
+            const confirmDeleteAll = confirm(
+                `⚠️⚠️⚠️ WARNING ⚠️⚠️⚠️\n\n` +
+                `You are about to delete ALL ${quotations.length} quotations.\n\n` +
+                `This will permanently remove:\n` +
+                `• ${quotations.length} quotation records\n` +
+                `• All customer details\n` +
+                `• All BOM items and costs\n\n` +
+                `This action CANNOT be undone!\n\n` +
+                `Do you want to proceed?`
+            );
+            
+            if (!confirmDeleteAll) {
+                return;
+            }
+            
+            const confirmText = prompt(
+                '⚠️ FINAL CONFIRMATION ⚠️\n\n' +
+                'Type "DELETE ALL" to confirm permanent deletion of ALL quotations:',
+                ''
+            );
+            
+            if (confirmText !== 'DELETE ALL') {
+                alert('Deletion cancelled');
+                return;
+            }
+            
+            localStorage.removeItem('quotations');
+            
+            if (localStorage.getItem('quotations_backup')) {
+                localStorage.removeItem('quotations_backup');
+            }
+            
+            alert(`✅ Successfully deleted all ${quotations.length} quotations`);
+            
+            loadQuotations();
+            closeModal();
+        }
+
+        // ========== MODAL FUNCTIONS ==========
+        function closeModal() {
+            const modal = document.getElementById('quotationModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('quotationModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('quotationModal');
+                if (modal && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+
+        // ========== QUOTATION STATUS MANAGEMENT ==========
+        function updateQuotationStatus(quotationId, newStatus, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            if (!currentUser) {
+                alert('❌ You must be logged in to perform this action');
+                return;
+            }
+            
+            if (currentUser.role !== 'admin') {
+                alert(`❌ Access Denied: Only Administrators can update quotation status.\n\nYour role: ${currentUser.role}\nRequired role: admin`);
+                return;
+            }
+            
+            let quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            const quotationIndex = quotations.findIndex(q => q.id === quotationId);
+            
+            if (quotationIndex === -1) {
+                alert('❌ Quotation not found');
+                return;
+            }
+            
+            const quotation = quotations[quotationIndex];
+            const oldStatus = quotation.status || 'draft';
+            
+            const validTransitions = {
+                'draft': ['sent', 'rejected'],
+                'sent': ['approved', 'rejected', 'draft'],
+                'approved': ['sent', 'rejected'],
+                'rejected': ['draft', 'sent']
+            };
+            
+            if (!validTransitions[oldStatus] || !validTransitions[oldStatus].includes(newStatus)) {
+                alert(`❌ Invalid status transition: Cannot change from "${oldStatus}" to "${newStatus}"`);
+                return;
+            }
+            
+            const statusLabels = {
+                'draft': '📝 Draft',
+                'sent': '📨 Sent to Customer',
+                'approved': '✅ Approved',
+                'rejected': '❌ Rejected'
+            };
+            
+            const confirmUpdate = confirm(
+                `⚠️ Update Quotation Status ⚠️\n\n` +
+                `Quotation: ${quotation.quotation_number || 'N/A'}\n` +
+                `Customer: ${quotation.customerName || quotation.customer_name || 'N/A'}\n` +
+                `Current Status: ${statusLabels[oldStatus] || oldStatus}\n` +
+                `New Status: ${statusLabels[newStatus] || newStatus}\n\n` +
+                `Are you sure you want to update this quotation status?`
+            );
+            
+            if (!confirmUpdate) {
+                return;
+            }
+            
+            try {
+                quotations[quotationIndex].status = newStatus;
+                quotations[quotationIndex].status_updated_at = new Date().toISOString();
+                quotations[quotationIndex].status_updated_by = currentUser.id || currentUser.username;
+                
+                if (!quotations[quotationIndex].status_history) {
+                    quotations[quotationIndex].status_history = [];
+                }
+                
+                quotations[quotationIndex].status_history.push({
+                    from: oldStatus,
+                    to: newStatus,
+                    by: currentUser.username,
+                    by_role: currentUser.role,
+                    timestamp: new Date().toISOString(),
+                    note: `Status changed from ${oldStatus} to ${newStatus} by ${currentUser.username}`
+                });
+                
+                localStorage.setItem('quotations', JSON.stringify(quotations));
+                
+                alert(`✅ Quotation status updated from "${oldStatus}" to "${newStatus}" successfully`);
+                
+                loadQuotations();
+                
+                const modal = document.getElementById('quotationModal');
+                if (modal && modal.style.display === 'flex') {
+                    viewQuotation(quotationId);
+                }
+            } catch (error) {
+                console.error('Update quotation status error:', error);
+                alert('❌ Failed to update quotation status: ' + error.message);
+            }
+        }
+
+        function getStatusBadge(status) {
+            const statusConfig = {
+                'draft': { class: 'badge-secondary', icon: '📝', text: 'Draft' },
+                'sent': { class: 'badge-primary', icon: '📨', text: 'Sent to Customer' },
+                'approved': { class: 'badge-success', icon: '✅', text: 'Approved' },
+                'rejected': { class: 'badge-danger', icon: '❌', text: 'Rejected' }
+            };
+            
+            const config = statusConfig[status] || { class: 'badge-secondary', icon: '📄', text: status || 'Unknown' };
+            
+            return `<span class="badge ${config.class}" style="background: ${
+                status === 'approved' ? '#28a745' : 
+                status === 'rejected' ? '#dc3545' : 
+                status === 'sent' ? '#17a2b8' : 
+                '#6c757d'
+            }; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px;">
+                ${config.icon} ${config.text}
+            </span>`;
+        }
+
+        // ========== PRINT QUOTATION FUNCTION ==========
+        function printQuotation(quotationId) {
+            const quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+            const quotation = quotations.find(q => q.id === quotationId);
+            
+            if (!quotation) {
+                alert('Quotation not found');
+                return;
+            }
+
+            try {
+                const printWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+                
+                if (!printWindow) {
+                    alert('Popup blocked! Please allow popups for this site to print quotations.');
+                    return;
+                }
+
+                const incomerItems = quotation.bomItems ? quotation.bomItems.filter(item => 
+                    item.category === 'Circuit Breaker' || 
+                    item.category === 'Busbar' ||
+                    item.category === 'Controller' ||
+                    item.category === 'Capacitor' ||
+                    item.category === 'Meter' ||
+                    item.category === 'Instrument'
+                ) : [];
+                
+                const outgoingItems = quotation.bomItems ? quotation.bomItems.filter(item => 
+                    item.category === 'Contactor' || 
+                    item.category === 'Protection'
+                ) : [];
+                
+                const otherItems = quotation.bomItems ? quotation.bomItems.filter(item => 
+                    item.category === 'Enclosure' ||
+                    item.category === 'Accessory'
+                ) : [];
+                
+                const customItems = quotation.bomItems ? quotation.bomItems.filter(item => 
+                    item.category === 'Custom'
+                ) : [];
+                
+                const createdDate = quotation.created_at ? new Date(quotation.created_at) : new Date();
+                const formattedDate = createdDate.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                let totalEnclosureCost = 0;
+                let totalSwitchgearCost = 0;
+                
+                if (quotation.bomItems) {
+                    quotation.bomItems.forEach(item => {
+                        const itemTotal = (item.quantity || 0) * (item.unit_price || 0);
+                        if (item.category === 'Enclosure') {
+                            totalEnclosureCost += itemTotal;
+                        } else {
+                            totalSwitchgearCost += itemTotal;
+                        }
+                    });
+                }
+                
+                const totalCost = totalEnclosureCost + totalSwitchgearCost;
+                const gstPercentage = quotation.costBreakdown?.gstPercentage || 18;
+                const gstAmount = totalCost * (gstPercentage/100);
+                const grandTotalValue = totalCost + gstAmount;
+                const amountInWords = numberToWords(Math.round(grandTotalValue)) || 'Zero';
+                
+                let quotationHTML = `<!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Quotation ${quotation.quotation_number || 'N/A'}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: Arial, Helvetica, sans-serif;
+                            margin: 20px;
+                            padding: 20px;
+                            font-size: 12px;
+                            line-height: 1.4;
+                            color: #000;
+                            background: #fff;
+                        }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .company-name {
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #1a237e;
+                            margin-bottom: 5px;
+                        }
+                        .company-details {
+                            font-size: 11px;
+                            color: #333;
+                            margin-bottom: 10px;
+                            line-height: 1.5;
+                        }
+                        .quotation-title {
+                            font-size: 20px;
+                            font-weight: bold;
+                            color: #283593;
+                            margin: 20px 0;
+                            text-decoration: underline;
+                        }
+                        .quotation-info {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 25px;
+                            border-bottom: 2px solid #283593;
+                            padding-bottom: 15px;
+                        }
+                        .info-box {
+                            background: #f8f9fa;
+                            padding: 15px;
+                            border-radius: 5px;
+                            margin-bottom: 20px;
+                        }
+                        .section { margin: 25px 0; }
+                        .section-title {
+                            font-size: 16px;
+                            font-weight: bold;
+                            color: #283593;
+                            margin-bottom: 15px;
+                            border-bottom: 2px solid #eef2f7;
+                            padding-bottom: 8px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 15px 0;
+                            font-size: 11px;
+                        }
+                        th {
+                            background: #283593;
+                            color: white;
+                            padding: 10px 8px;
+                            font-weight: 600;
+                            text-align: left;
+                            border: 1px solid #1a237e;
+                        }
+                        td {
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            text-align: left;
+                            vertical-align: top;
+                        }
+                        tr:nth-child(even) { background: #f9f9f9; }
+                        .price-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        .price-table th {
+                            background: #283593;
+                            color: white;
+                            padding: 12px 8px;
+                            text-align: center;
+                            border: 1px solid #1a237e;
+                        }
+                        .price-table td {
+                            padding: 10px 8px;
+                            border: 1px solid #ddd;
+                            text-align: center;
+                        }
+                        .price-table .main-item { background: #e8eaf6; font-weight: bold; }
+                        .price-table .indented-row td { padding-left: 25px; text-align: left; }
+                        .subtotal-row { background: #e0e0e0; font-weight: bold; }
+                        .subtotal-row td { text-align: right; }
+                        .gst-row { background: #f5f5f5; font-weight: bold; }
+                        .gst-row td { text-align: right; }
+                        .grandtotal-row {
+                            background: #d4edda;
+                            font-weight: bold;
+                            font-size: 14px;
+                        }
+                        .grandtotal-row td {
+                            text-align: right;
+                            border-top: 2px solid #155724;
+                            border-bottom: 2px solid #155724;
+                        }
+                        .terms-list {
+                            margin-left: 20px;
+                            margin-top: 10px;
+                            margin-bottom: 20px;
+                        }
+                        .terms-list li {
+                            margin-bottom: 8px;
+                            line-height: 1.5;
+                            font-size: 11px;
+                        }
+                        .signature-area {
+                            margin-top: 50px;
+                            text-align: right;
+                            border-top: 1px solid #333;
+                            padding-top: 20px;
+                            width: 300px;
+                            float: right;
+                        }
+                        .footer {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 10px;
+                            color: #666;
+                            border-top: 1px dashed #999;
+                            padding-top: 15px;
+                            clear: both;
+                        }
+                        .no-print {
+                            display: block;
+                            text-align: center;
+                            margin: 20px 0;
+                            padding: 10px;
+                        }
+                        .no-print button {
+                            padding: 10px 20px;
+                            margin: 0 10px;
+                            background: #283593;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        }
+                        .no-print button:hover { background: #1a237e; }
+                        @media print {
+                            @page { size: A4; margin: 1.5cm; }
+                            body { margin: 0; padding: 0; background: white; font-size: 11pt; }
+                            .no-print { display: none !important; }
+                            .section { page-break-inside: avoid; }
+                            table { page-break-inside: avoid; }
+                            tr { page-break-inside: avoid; }
+                            thead { display: table-header-group; }
+                            tfoot { display: table-footer-group; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="company-name">AMPRISE PANELS PRIVATE LIMITED</div>
+                        <div class="company-details">
+                            ISO 9001:2015 CERTIFIED<br>
+                            H-10, LIGHT INDUSTRIAL AREA, BHILAI, CHHATTISGARH - 490026<br>
+                            Email: amprisepanels@gmail.com | Mobile: +91 8085524096<br>
+                            GSTIN: 22ABCCA6801D1ZD | MSME: UDYAM-CG-05-0056710
+                        </div>
+                        <div class="quotation-title">QUOTATION</div>
+                    </div>
+
+                    <div class="quotation-info">
+                        <div>
+                            <strong>Quotation No:</strong> ${quotation.quotation_number || 'N/A'}<br>
+                            <strong>Date:</strong> ${formattedDate}<br>
+                            <strong>Valid Until:</strong> ${new Date(createdDate.getTime() + 30*24*60*60*1000).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'})}
+                        </div>
+                        <div>
+                            <strong>Customer Ref:</strong><br>
+                            ${quotation.customerName || 'N/A'}<br>
+                            ${quotation.customerPhone || ''}
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <table style="width: 100%; margin: 0; border: none; background: transparent;">
+                            <tr style="background: transparent;">
+                                <td style="border: none; padding: 5px; width: 15%;"><strong>To,</strong></td>
+                                <td style="border: none; padding: 5px;"><strong>${quotation.customerName || 'N/A'}</strong></td>
+                            </tr>
+                            <tr style="background: transparent;">
+                                <td style="border: none; padding: 5px;"><strong>Address:</strong></td>
+                                <td style="border: none; padding: 5px;">${quotation.customerAddress || 'N/A'}</td>
+                            </tr>
+                            <tr style="background: transparent;">
+                                <td style="border: none; padding: 5px;"><strong>Phone:</strong></td>
+                                <td style="border: none; padding: 5px;">${quotation.customerPhone || 'N/A'}</td>
+                            </tr>
+                            ${quotation.customerEmail ? `<tr style="background: transparent;"><td style="border: none; padding: 5px;"><strong>Email:</strong></td><td style="border: none; padding: 5px;">${quotation.customerEmail}</td></tr>` : ''}
+                            ${quotation.gstNumber ? `<tr style="background: transparent;"><td style="border: none; padding: 5px;"><strong>GST:</strong></td><td style="border: none; padding: 5px;">${quotation.gstNumber}</td></tr>` : ''}
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">PANEL SPECIFICATIONS</div>
+                        <table>
+                            <tr>
+                                <td style="width: 20%; background: #f0f4ff;"><strong>Panel Type:</strong></td>
+                                <td style="width: 30%;">${quotation.panelType || 'N/A'}</td>
+                                <td style="width: 20%; background: #f0f4ff;"><strong>Panel Name:</strong></td>
+                                <td style="width: 30%;">${quotation.panelName || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="background: #f0f4ff;"><strong>Panel Size:</strong></td>
+                                <td>${quotation.panelSize || 'N/A'}</td>
+                                <td style="background: #f0f4ff;"><strong>IP Rating:</strong></td>
+                                <td>${quotation.ipRating || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="background: #f0f4ff;"><strong>Incoming Supply:</strong></td>
+                                <td>${quotation.incomingSupply || 'N/A'}</td>
+                                <td style="background: #f0f4ff;"><strong>Brand Preference:</strong></td>
+                                <td>${quotation.brandPreference || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="background: #f0f4ff;"><strong>Busbar Type:</strong></td>
+                                <td>${quotation.busbarType || 'N/A'}</td>
+                                <td style="background: #f0f4ff;"><strong>Feeders/Motors:</strong></td>
+                                <td>${quotation.feederCount || 0} Feeders, ${quotation.motorCount || 0} Motors</td>
+                            </tr>
+                            ${quotation.specialRequirements ? `
+                            <tr>
+                                <td style="background: #f0f4ff;"><strong>Special Requirements:</strong></td>
+                                <td colspan="3">${quotation.specialRequirements}</td>
+                            </tr>` : ''}
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">BILL OF MATERIALS (BOM)</div>`;
+
+                if (incomerItems.length > 0) {
+                    quotationHTML += `
+                        <p style="font-weight: bold; margin: 15px 0 5px 0; padding: 5px; background: #e8eaf6;">INCOMER SECTION</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="5%">Sr.</th>
+                                    <th width="25%">Component Name</th>
+                                    <th width="15%">Category</th>
+                                    <th width="20%">Specifications</th>
+                                    <th width="10%">Brand</th>
+                                    <th width="8%">Qty</th>
+                                    <th width="7%">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    let srNo = 1;
+                    incomerItems.forEach(item => {
+                        quotationHTML += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td>${item.name || ''}</td>
+                                <td>${item.category || ''}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand || ''}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${item.unit || 'Pcs'}</td>
+                            </tr>`;
+                    });
+                    
+                    quotationHTML += `
+                            </tbody>
+                        </table>`;
+                }
+                
+                if (outgoingItems.length > 0) {
+                    quotationHTML += `
+                        <p style="font-weight: bold; margin: 15px 0 5px 0; padding: 5px; background: #e8eaf6;">OUTGOING SECTION</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="5%">Sr.</th>
+                                    <th width="25%">Component Name</th>
+                                    <th width="15%">Category</th>
+                                    <th width="20%">Specifications</th>
+                                    <th width="10%">Brand</th>
+                                    <th width="8%">Qty</th>
+                                    <th width="7%">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    let srNo = 1;
+                    outgoingItems.forEach(item => {
+                        quotationHTML += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td>${item.name || ''}</td>
+                                <td>${item.category || ''}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand || ''}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${item.unit || 'Pcs'}</td>
+                            </tr>`;
+                    });
+                    
+                    quotationHTML += `
+                            </tbody>
+                        </table>`;
+                }
+                
+                if (otherItems.length > 0) {
+                    quotationHTML += `
+                        <p style="font-weight: bold; margin: 15px 0 5px 0; padding: 5px; background: #e8eaf6;">OTHER COMPONENTS</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="5%">Sr.</th>
+                                    <th width="25%">Component Name</th>
+                                    <th width="15%">Category</th>
+                                    <th width="20%">Specifications</th>
+                                    <th width="10%">Brand</th>
+                                    <th width="8%">Qty</th>
+                                    <th width="7%">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    let srNo = 1;
+                    otherItems.forEach(item => {
+                        quotationHTML += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td>${item.name || ''}</td>
+                                <td>${item.category || ''}</td>
+                                <td>${item.specifications || 'Standard'}</td>
+                                <td>${item.brand || ''}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${item.unit || 'Pcs'}</td>
+                            </tr>`;
+                    });
+                    
+                    quotationHTML += `
+                            </tbody>
+                        </table>`;
+                }
+                
+                if (customItems.length > 0) {
+                    quotationHTML += `
+                        <p style="font-weight: bold; margin: 15px 0 5px 0; padding: 5px; background: #c8e6c9;">CUSTOM COMPONENTS</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="5%">Sr.</th>
+                                    <th width="25%">Component Name</th>
+                                    <th width="15%">Category</th>
+                                    <th width="20%">Specifications</th>
+                                    <th width="10%">Brand</th>
+                                    <th width="8%">Qty</th>
+                                    <th width="7%">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    let srNo = 1;
+                    customItems.forEach(item => {
+                        quotationHTML += `
+                            <tr>
+                                <td>${srNo++}</td>
+                                <td>${item.name || ''}</td>
+                                <td>${item.category || ''}</td>
+                                <td>${item.specifications || 'Custom specifications'}</td>
+                                <td>${item.brand || ''}</td>
+                                <td>${item.quantity || 0}</td>
+                                <td>${item.unit || 'Pcs'}</td>
+                            </tr>`;
+                    });
+                    
+                    quotationHTML += `
+                            </tbody>
+                        </table>`;
+                }
+
+                quotationHTML += `
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">PRICE BID</div>
+                        <table class="price-table">
+                            <thead>
+                                <tr>
+                                    <th width="5%">SR NO.</th>
+                                    <th width="50%">DESCRIPTION</th>
+                                    <th width="10%">QTY/SET</th>
+                                    <th width="15%">RATE (₹)</th>
+                                    <th width="20%">AMOUNT (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="main-item">
+                                    <td>1</td>
+                                    <td style="text-align: left; font-weight: bold;">${quotation.panelType || 'Panel'} PANEL, ENCLOSURE: ${quotation.panelSize || 'Standard'}, ${quotation.ipRating || 'IP55'}, INDOOR TYPE, WITH COMPLETE WIRING (AS PER DRAWING)</td>
+                                    <td>1</td>
+                                    <td>₹${totalEnclosureCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                    <td>₹${totalEnclosureCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                </tr>
+                                <tr class="indented-row">
+                                    <td></td>
+                                    <td style="text-align: left;">${quotation.panelType || 'Panel'} PANEL'S SWITCHGEAR & METERING ITEMS (AS PER BOM ATTACHED)</td>
+                                    <td></td>
+                                    <td>₹${totalSwitchgearCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                    <td>₹${totalSwitchgearCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                </tr>
+                                <tr class="subtotal-row">
+                                    <td colspan="4" style="text-align: right; font-weight: bold;">SUB TOTAL</td>
+                                    <td>₹${totalCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                </tr>
+                                <tr class="gst-row">
+                                    <td colspan="4" style="text-align: right; font-weight: bold;">GST @ ${gstPercentage}%</td>
+                                    <td>₹${gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                </tr>
+                                <tr class="grandtotal-row">
+                                    <td colspan="4" style="text-align: right; font-weight: bold;">GRAND TOTAL</td>
+                                    <td>₹${grandTotalValue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 15px; font-weight: bold; font-size: 12px;">
+                            Amount in Words: ${amountInWords} only.
+                        </p>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">TERMS AND CONDITIONS</div>
+                        <ol class="terms-list">
+                            <li><strong>Price:</strong> All prices are exclusive of GST. GST @ 18% will be charged extra as applicable.</li>
+                            <li><strong>Delivery:</strong> 4-5 weeks from the date of receipt of advance payment and approved drawing.</li>
+                            <li><strong>Payment Terms:</strong> 50% advance with order and balance 50% before dispatch.</li>
+                            <li><strong>Validity:</strong> This quotation is valid for 30 days from the date mentioned above.</li>
+                            <li><strong>Warranty:</strong> 12 months from the date of commissioning or 18 months from the date of dispatch.</li>
+                            <li><strong>Scope of Supply:</strong> Complete panel with all components as per BOM. Erection and commissioning not included.</li>
+                            <li><strong>Transportation:</strong> Extra at actuals, or customer can arrange own transport.</li>
+                            <li><strong>Inspection:</strong> Customer inspection can be carried out at our works before dispatch.</li>
+                            <li><strong>GST:</strong> Under reverse charge mechanism does not apply. GST payable by recipient.</li>
+                            <li><strong>Jurisdiction:</strong> All disputes subject to Durg (Chhattisgarh) jurisdiction only.</li>
+                        </ol>
+                    </div>
+
+                    <div class="signature-area">
+                        <p style="margin-bottom: 5px;">For <strong>AMPRISE PANELS PRIVATE LIMITED</strong></p>
+                        <br><br><br>
+                        <p>_________________________________</p>
+                        <p style="margin-top: 5px;"><strong>Authorized Signatory</strong></p>
+                    </div>
+
+                    <div class="footer">
+                        <p>This is a computer generated quotation - valid with signature and stamp.</p>
+                        <p>Thank you for your business!</p>
+                    </div>
+
+                    <div class="no-print">
+                        <button onclick="window.print();">Print Quotation</button>
+                        <button onclick="window.close();">Close</button>
+                    </div>
+                </body>
+                </html>`;
+
+                printWindow.document.open();
+                printWindow.document.write(quotationHTML);
+                printWindow.document.close();
+                printWindow.focus();
+            } catch (error) {
+                console.error('Print error:', error);
+                alert('Error generating quotation: ' + error.message);
+            }
+        }
+
+        function downloadQuotation(quotationId) {
+            alert('PDF download is simulated. In a real application, this would generate a PDF file.\nFor now, please use the Print option to save as PDF.');
+            printQuotation(quotationId);
+        }
+
+        // ========== COMPONENT DATABASE FUNCTIONS ==========
+        function loadComponents() {
+            const container = document.getElementById('componentsList');
+            
+            const categories = {};
+            Object.keys(componentDatabase).forEach(key => {
+                const component = componentDatabase[key];
+                if (!categories[component.category]) {
+                    categories[component.category] = [];
+                }
+                categories[component.category].push(component);
+            });
+            
+            let html = '';
+            
+            const categoryNames = Object.keys(categories).sort();
+            html += `
+                <div style="margin-bottom: 30px;">
+                    <div class="category-tabs" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+            `;
+            
+            categoryNames.forEach((cat, index) => {
+                html += `
+                    <button class="category-tab" onclick="showComponentCategory(event, '${cat}')" 
+                            style="padding: 10px 20px; background: ${index === 0 ? '#667eea' : '#f0f0f0'}; 
+                                   color: ${index === 0 ? 'white' : '#333'}; border: none; 
+                                   border-radius: 5px; cursor: pointer;">
+                        ${cat}
+                    </button>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            categoryNames.forEach((category, index) => {
+                html += `
+                    <div class="category-section" id="category-${category.replace(/\s+/g, '-')}" 
+                         style="display: ${index === 0 ? 'block' : 'none'}; margin-bottom: 40px;">
+                        <h4 style="color: #283593; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #eef2f7;">
+                            <i class="fas fa-box-open"></i> ${category} Components
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                `;
+                
+                categories[category].forEach(comp => {
+                    html += `
+                        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <h5 style="color: #283593; margin-bottom: 10px;">${comp.name}</h5>
+                            <p style="margin-bottom: 5px; font-size: 14px;"><strong>Brand:</strong> ${comp.brand}</p>
+                            <p style="margin-bottom: 5px; font-size: 14px;"><strong>Specifications:</strong> ${comp.specifications}</p>
+                            <p style="margin-bottom: 10px; font-size: 14px;"><strong>Unit Price:</strong> ₹${comp.unit_price.toLocaleString('en-IN')}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 12px; color: #666;">${comp.unit}</span>
+                                <div>
+                                    <button onclick="addComponentToPanel('${comp.name}')" style="padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; margin-right: 5px;">
+                                        <i class="fas fa-plus"></i> Add to Panel
+                                    </button>
+                                    <button onclick="deleteComponent('${comp.name}')" style="padding: 6px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showComponentCategory(event, category) {
+            document.querySelectorAll('.category-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const categoryId = category.replace(/\s+/g, '-');
+            const categorySection = document.getElementById(`category-${categoryId}`);
+            if (categorySection) {
+                categorySection.style.display = 'block';
+            }
+            
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.style.background = '#f0f0f0';
+                tab.style.color = '#333';
+            });
+            event.target.style.background = '#667eea';
+            event.target.style.color = 'white';
+        }
+
+        function toggleAddComponentForm() {
+            const form = document.getElementById('addComponentForm');
+            form.classList.toggle('active');
+            
+            if (form.classList.contains('active')) {
+                document.getElementById('newComponentName').value = '';
+                document.getElementById('newComponentCategory').value = '';
+                document.getElementById('newComponentBrand').value = '';
+                document.getElementById('newComponentSpecs').value = '';
+                document.getElementById('newComponentPrice').value = '';
+                document.getElementById('newComponentUnit').value = 'Pcs';
+                form.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function saveNewComponent() {
+            const name = document.getElementById('newComponentName').value.trim();
+            const category = document.getElementById('newComponentCategory').value;
+            const brand = document.getElementById('newComponentBrand').value.trim();
+            const specs = document.getElementById('newComponentSpecs').value.trim();
+            const price = parseFloat(document.getElementById('newComponentPrice').value);
+            const unit = document.getElementById('newComponentUnit').value;
+
+            if (!name || !category || !brand || !specs || isNaN(price) || price <= 0) {
+                alert('Please fill in all fields with valid values');
+                return;
+            }
+
+            const key = name.replace(/\s+/g, '-').toUpperCase() + '-' + Date.now().toString().slice(-4);
+            
+            componentDatabase[key] = {
+                name: name,
+                category: category,
+                brand: brand,
+                specifications: specs,
+                unit_price: price,
+                unit: unit
+            };
+            
+            saveComponentDatabase();
+            loadComponents();
+            toggleAddComponentForm();
+            alert(`Component "${name}" added successfully!`);
+        }
+
+        function deleteComponent(componentName) {
+            if (!confirm(`Are you sure you want to delete "${componentName}"?`)) {
+                return;
+            }
+            
+            let componentKey = null;
+            for (const key in componentDatabase) {
+                if (componentDatabase[key].name === componentName) {
+                    componentKey = key;
+                    break;
+                }
+            }
+            
+            if (componentKey) {
+                delete componentDatabase[componentKey];
+                saveComponentDatabase();
+                loadComponents();
+                alert(`Component "${componentName}" deleted successfully!`);
+            }
+        }
+
+        function addComponentToPanel(componentName) {
+            let componentKey = null;
+            for (const key in componentDatabase) {
+                if (componentDatabase[key].name === componentName) {
+                    componentKey = key;
+                    break;
+                }
+            }
+            
+            if (!componentKey) {
+                alert('Component not found in database');
+                return;
+            }
+            
+            const component = componentDatabase[componentKey];
+            
+            showTab(null, 'estimation');
+            
+            document.getElementById('panelType').value = 'custom';
+            togglePanelOptions();
+            
+            customComponents.push({
+                id: customComponents.length + 1,
+                name: component.name,
+                category: component.category,
+                brand: component.brand,
+                specifications: component.specifications,
+                quantity: 1,
+                unit_price: component.unit_price
+            });
+            
+            renderCustomComponents();
+            alert(`Added ${componentName} to custom panel`);
+        }
+
+        // ========== HISTORY FUNCTIONS ==========
+        function loadQuotations() {
+            const container = document.getElementById('quotationsList');
+            
+            if (!container) return;
+            
+            document.getElementById('historySpinner').style.display = 'block';
+            
+            setTimeout(() => {
+                let quotations = JSON.parse(localStorage.getItem('quotations')) || [];
+                
+                if (quotations.length === 0) {
+                    const demoQuotations = [
+                        {
+                            id: 1,
+                            quotation_number: '2024/QUO/001',
+                            customerName: 'ABC Manufacturing Co.',
+                            customerAddress: 'Industrial Area, Raipur, Chhattisgarh',
+                            customerPhone: '9876543210',
+                            customerEmail: 'info@abcmfg.com',
+                            gstNumber: '22AAAAA0000A1Z5',
+                            panelType: 'MCC',
+                            panelName: 'Main Motor Control Panel',
+                            panelSize: '800x800x300',
+                            ipRating: 'IP55',
+                            busbarType: 'copper',
+                            brandPreference: 'schneider',
+                            incomingSupply: '415V-3P',
+                            feederCount: 8,
+                            motorCount: 4,
+                            specialRequirements: 'Need emergency stop push button',
+                            created_at: '2024-01-15T10:30:00.000Z',
+                            costBreakdown: { 
+                                finalAmount: 185500,
+                                gstPercentage: 18,
+                                totalCost: 157203.39
+                            },
+                            bomItems: [],
+                            status: 'approved',
+                            status_history: [{
+                                from: null,
+                                to: 'approved',
+                                by: 'admin',
+                                by_role: 'admin',
+                                timestamp: '2024-01-15T10:35:00.000Z',
+                                note: 'Quotation approved'
+                            }]
+                        },
+                        {
+                            id: 2,
+                            quotation_number: '2024/QUO/002',
+                            customerName: 'XYZ Steel Plant',
+                            customerAddress: 'Bhilai, Chhattisgarh',
+                            customerPhone: '9876543211',
+                            customerEmail: 'purchase@xyzsteel.com',
+                            panelType: 'PCC',
+                            panelName: 'Power Distribution Panel',
+                            panelSize: '1000x1000x400',
+                            ipRating: 'IP55',
+                            busbarType: 'copper',
+                            brandPreference: 'abb',
+                            incomingSupply: '415V-3P',
+                            feederCount: 12,
+                            motorCount: 0,
+                            created_at: '2024-01-20T14:45:00.000Z',
+                            costBreakdown: { 
+                                finalAmount: 325000,
+                                gstPercentage: 18,
+                                totalCost: 275423.73
+                            },
+                            bomItems: [],
+                            status: 'sent',
+                            status_history: [{
+                                from: 'draft',
+                                to: 'sent',
+                                by: 'engineer',
+                                by_role: 'engineer',
+                                timestamp: '2024-01-20T15:00:00.000Z',
+                                note: 'Quotation sent to customer'
+                            }]
+                        },
+                        {
+                            id: 3,
+                            quotation_number: '2024/QUO/003',
+                            customerName: 'PQR Textiles Ltd.',
+                            customerAddress: 'Durg, Chhattisgarh',
+                            customerPhone: '9876543212',
+                            panelType: 'APFC',
+                            panelName: 'Automatic Power Factor Correction Panel',
+                            panelSize: '1600x1700x600',
+                            ipRating: 'IP55',
+                            busbarType: 'copper',
+                            brandPreference: 'siemens',
+                            incomingSupply: '415V-3P',
+                            feederCount: 6,
+                            motorCount: 0,
+                            created_at: '2024-01-25T09:15:00.000Z',
+                            costBreakdown: { 
+                                finalAmount: 278000,
+                                gstPercentage: 18,
+                                totalCost: 235593.22
+                            },
+                            bomItems: [],
+                            status: 'draft',
+                            status_history: []
+                        }
+                    ];
+                    localStorage.setItem('quotations', JSON.stringify(demoQuotations));
+                    quotations = demoQuotations;
+                }
+                
+                document.getElementById('historySpinner').style.display = 'none';
+                displayQuotations(quotations);
+            }, 500);
+        }
+
+        // ========== FIXED DISPLAY QUOTATIONS FUNCTION ==========
+        function displayQuotations(quotations) {
+            const container = document.getElementById('quotationsList');
+            
+            if (!container) return;
+            
+            if (!quotations || quotations.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px 40px; background: white; border-radius: 12px; color: #666;">
+                        <i class="fas fa-inbox" style="font-size: 64px; margin-bottom: 20px; color: #ccc;"></i>
+                        <h3 style="margin-bottom: 15px; color: #283593;">No Quotations Found</h3>
+                        <p style="margin-bottom: 20px; font-size: 16px;">Generate your first quotation in the Panel Estimation tab</p>
+                        <button onclick="showTab(null, 'estimation')" class="btn btn-primary" style="padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-calculator"></i> Go to Panel Estimation
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="color: #283593; margin: 0;">
+                            <i class="fas fa-file-invoice-dollar"></i> Quotations (${quotations.length})
+                        </h3>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">
+                            Logged in as: <strong>${currentUser?.username || 'User'}</strong> 
+                            (${currentUser?.role || 'Unknown'})
+                        </p>
+                    </div>
+                    ${isAdmin ? `
+                    <div>
+                        <button onclick="deleteAllQuotations()" class="btn btn-danger" style="background: #dc3545; color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer;">
+                            <i class="fas fa-trash-alt"></i> Delete All Quotations
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Quotation No.</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Panel Type</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            quotations.sort((a, b) => {
+                const dateA = a.created_at ? new Date(a.created_at) : new Date(0);
+                const dateB = b.created_at ? new Date(b.created_at) : new Date(0);
+                return dateB - dateA;
+            });
+            
+            quotations.forEach(quote => {
+                const date = quote.created_at ? new Date(quote.created_at) : new Date();
+                const formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                const totalAmount = quote.costBreakdown ? 
+                    (quote.costBreakdown.finalAmount || 0) : 
+                    (quote.final_amount || quote.totalAmount || 0);
+                
+                html += `
+                    <tr>
+                        <td><strong>${quote.quotation_number || 'N/A'}</strong></td>
+                        <td>${formattedDate}</td>
+                        <td>${quote.customerName || quote.customer_name || 'N/A'}</td>
+                        <td>${quote.panelType || quote.panel_type || 'N/A'}</td>
+                        <td>₹${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>
+                            ${getStatusBadge(quote.status || 'draft')}
+                            ${isAdmin ? `
+                            <div style="margin-top: 5px;">
+                                <select onchange="updateQuotationStatus(${quote.id}, this.value, event)" 
+                                        style="padding: 3px 5px; font-size: 11px; border-radius: 3px; border: 1px solid #ddd;">
+                                    <option value="draft" ${quote.status === 'draft' ? 'selected' : ''}>📝 Draft</option>
+                                    <option value="sent" ${quote.status === 'sent' ? 'selected' : ''}>📨 Sent</option>
+                                    <option value="approved" ${quote.status === 'approved' ? 'selected' : ''}>✅ Approved</option>
+                                    <option value="rejected" ${quote.status === 'rejected' ? 'selected' : ''}>❌ Rejected</option>
+                                </select>
+                            </div>
+                            ` : ''}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="viewQuotation(${quote.id})" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button onclick="printQuotation(${quote.id})" class="btn btn-success" style="padding: 6px 12px; font-size: 12px; background: #00b09b; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                ${isAdmin ? `
+                                <button onclick="deleteQuotation(${quote.id}, event)" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            if (!isAdmin && quotations.length > 0) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f4fd; border: 1px solid #b8e2ff; border-radius: 5px; color: #0066cc;">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Info:</strong> You are logged in as <strong>${currentUser?.role || 'User'}</strong>. 
+                        Only Administrators can delete quotations. Contact admin@amprise.com for deletions.
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', options);
+        }
+
+        function showAlert(alertElement, message, type) {
+            alertElement.innerHTML = `
+                <div class="alert ${type}">
+                    <strong>${type === 'error' ? 'Error!' : 'Success!'}</strong> ${message}
+                </div>
+            `;
+            alertElement.style.display = 'block';
+            
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function numberToWords(num) {
+            const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+            const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            
+            if (num === 0) return 'zero';
+            
+            function convertLessThanThousand(number) {
+                let result = '';
+                
+                if (number >= 100) {
+                    result += ones[Math.floor(number / 100)] + ' hundred ';
+                    number %= 100;
+                }
+                
+                if (number >= 20) {
+                    result += tens[Math.floor(number / 10)] + ' ';
+                    number %= 10;
+                } else if (number >= 10) {
+                    result += teens[number - 10] + ' ';
+                    number = 0;
+                }
+                
+                if (number > 0) {
+                    result += ones[number] + ' ';
+                }
+                
+                return result.trim();
+            }
+            
+            let result = '';
+            
+            if (num >= 10000000) {
+                result += convertLessThanThousand(Math.floor(num / 10000000)) + ' crore ';
+                num %= 10000000;
+            }
+            
+            if (num >= 100000) {
+                result += convertLessThanThousand(Math.floor(num / 100000)) + ' lakh ';
+                num %= 100000;
+            }
+            
+            if (num >= 1000) {
+                result += convertLessThanThousand(Math.floor(num / 1000)) + ' thousand ';
+                num %= 1000;
+            }
+            
+            if (num > 0) {
+                result += convertLessThanThousand(num);
+            }
+            
+            return result.trim() + ' rupees';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser === 'demo') {
+                demoLogin();
+            }
+        });
+    </script>
+</body>
+</html>

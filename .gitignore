@@ -1,0 +1,7 @@
+echo "node_modules/
+.env
+.DS_Store
+*.log
+backend/database/*.db
+!backend/database/panel-estimation.db
+" > .gitignore
