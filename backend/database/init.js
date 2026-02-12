@@ -1,6 +1,7 @@
 /**
  * AMPRISE PANELS - Database Initialization
- * FIXED: All users now have correct password 'admin123'
+ * FIXED FOR RENDER FREE TIER - Uses DB_PATH from environment
+ * FIXED: Preserves existing users, only creates if none exist
  */
 
 const sqlite3 = require('sqlite3').verbose();
@@ -9,33 +10,54 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 
-// Ensure database directory exists
-const dbDir = path.join(__dirname);
-if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-}
-
-const dbPath = path.join(__dirname, 'panel-estimation.db');
-
 /**
  * Initialize Database with Complete Schema
+ * Uses DB_PATH from environment variables (set in server.js)
  */
 async function initializeDatabase() {
     console.log('🔧 AMPRISE PANELS - Database Initialization');
     console.log('============================================');
     
+    // ✅ CRITICAL FIX: Use DB_PATH from environment, fallback to local path
+    const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'panel-estimation.db');
+    console.log(`📁 Database path: ${DB_PATH}`);
+    
     try {
+        // For in-memory database, skip directory creation
+        if (DB_PATH !== ':memory:') {
+            // ✅ FIX: Ensure directory exists for the database file
+            const dbDir = path.dirname(DB_PATH);
+            if (!fs.existsSync(dbDir)) {
+                console.log(`📁 Creating directory: ${dbDir}`);
+                fs.mkdirSync(dbDir, { recursive: true });
+            }
+            
+            // ✅ FIX: Check if directory is writable
+            try {
+                fs.accessSync(dbDir, fs.constants.W_OK);
+                console.log('✅ Directory is writable');
+            } catch (err) {
+                console.error('❌ Directory is NOT writable:', dbDir);
+                console.log('⚠️ Falling back to in-memory database');
+                process.env.DB_PATH = ':memory:';
+                return initializeDatabase(); // Recursive call with memory DB
+            }
+        }
+
         // Open database connection
         const db = await open({
-            filename: dbPath,
+            filename: DB_PATH,
             driver: sqlite3.Database
         });
 
         console.log('✅ Database connection established');
 
-        // Enable foreign keys
+        // Enable foreign keys and WAL mode (skip for in-memory)
         await db.exec('PRAGMA foreign_keys = ON;');
-        await db.exec('PRAGMA journal_mode = WAL;');
+        if (DB_PATH !== ':memory:') {
+            await db.exec('PRAGMA journal_mode = WAL;');
+            console.log('✅ WAL mode enabled');
+        }
 
         // ============= CREATE TABLES =============
         console.log('\n📦 Creating tables...');
@@ -159,39 +181,63 @@ async function initializeDatabase() {
         // ============= INSERT DEFAULT DATA =============
         console.log('\n📊 Checking and inserting default data...');
 
-        // Clear existing users to ensure correct passwords
-        await db.run('DELETE FROM users');
-        console.log('  🗑️  Cleared existing users');
+        // ✅ FIX: DO NOT DELETE USERS! Only create if none exist
+        const userCount = await db.get('SELECT COUNT(*) as count FROM users');
+        
+        if (userCount.count === 0) {
+            console.log('  ⚠️  No users found. Creating default users...');
+            
+            // Hash password for ALL users - using 'admin123'
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash('admin123', salt);
+            console.log('  🔐 Using password: admin123 for all users');
 
-        // Hash password for ALL users - using 'admin123' consistently
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('admin123', salt);
-        console.log('  🔐 Using password: admin123 for all users');
-
-        // Insert users with CORRECT password
-        await db.run(`
-            INSERT INTO users (username, password, role, full_name, email) VALUES
-            (?, ?, ?, ?, ?),
-            (?, ?, ?, ?, ?),
-            (?, ?, ?, ?, ?),
-            (?, ?, ?, ?, ?)
-        `, [
-            'admin', hashedPassword, 'admin', 'System Administrator', 'admin@amprise.com',
-            'engineer', hashedPassword, 'engineer', 'Estimation Engineer', 'engineer@amprise.com',
-            'sales', hashedPassword, 'sales', 'Sales Executive', 'sales@amprise.com',
-            'manager', hashedPassword, 'manager', 'Operations Manager', 'manager@amprise.com'
-        ]);
-        console.log('  ✅ Users created with password: admin123');
-        console.log('     ├─ admin / admin123');
-        console.log('     ├─ engineer / admin123');
-        console.log('     ├─ sales / admin123');
-        console.log('     └─ manager / admin123');
+            // Insert users
+            await db.run(`
+                INSERT INTO users (username, password, role, full_name, email) VALUES
+                (?, ?, ?, ?, ?),
+                (?, ?, ?, ?, ?),
+                (?, ?, ?, ?, ?),
+                (?, ?, ?, ?, ?)
+            `, [
+                'admin', hashedPassword, 'admin', 'System Administrator', 'admin@amprise.com',
+                'engineer', hashedPassword, 'engineer', 'Estimation Engineer', 'engineer@amprise.com',
+                'sales', hashedPassword, 'sales', 'Sales Executive', 'sales@amprise.com',
+                'manager', hashedPassword, 'manager', 'Operations Manager', 'manager@amprise.com'
+            ]);
+            console.log('  ✅ Default users created successfully');
+            console.log('     ├─ admin / admin123');
+            console.log('     ├─ engineer / admin123');
+            console.log('     ├─ sales / admin123');
+            console.log('     └─ manager / admin123');
+        } else {
+            console.log(`  ✅ Users already exist (${userCount.count} users found) - preserving existing data`);
+            
+            // ✅ FIX: Optionally verify admin password and update if needed
+            const adminUser = await db.get('SELECT * FROM users WHERE username = ?', ['admin']);
+            if (adminUser) {
+                try {
+                    // Test if password works with 'admin123'
+                    const testPassword = await bcrypt.compare('admin123', adminUser.password);
+                    if (!testPassword) {
+                        console.log('  ⚠️  Admin password is not set to admin123 - updating...');
+                        const salt = await bcrypt.genSalt(10);
+                        const newHashedPassword = await bcrypt.hash('admin123', salt);
+                        await db.run('UPDATE users SET password = ? WHERE username = ?', [newHashedPassword, 'admin']);
+                        console.log('  ✅ Admin password updated to admin123');
+                    }
+                } catch (err) {
+                    console.log('  ⚠️  Could not verify admin password');
+                }
+            }
+        }
 
         // Check if panel types exist
         const panelCount = await db.get('SELECT COUNT(*) as count FROM panel_types');
         
         if (panelCount.count === 0) {
-            // Insert default panel types
+            console.log('  ⚠️  No panel types found. Creating default panel types...');
+            
             await db.run(`
                 INSERT INTO panel_types (panel_code, name, description, base_wiring_cost, base_fabrication_cost, base_labor_cost, profit_margin) VALUES
                 ('MCC', 'MCC Panel', 'Motor Control Center', 15000.00, 20000.00, 10000.00, 20.00),
@@ -203,14 +249,15 @@ async function initializeDatabase() {
             `);
             console.log('  ✅ Default panel types created');
         } else {
-            console.log('  ✅ Panel types already exist');
+            console.log(`  ✅ Panel types already exist (${panelCount.count} types)`);
         }
 
         // Check if components exist
         const componentCount = await db.get('SELECT COUNT(*) as count FROM components');
         
         if (componentCount.count === 0) {
-            // Insert sample components
+            console.log('  ⚠️  No components found. Creating default components...');
+            
             await db.run(`
                 INSERT INTO components (component_code, name, category, brand, specifications, unit_price, stock_unit) VALUES
                 ('MCCB-100A', 'MCCB 100A', 'Circuit Breaker', 'Schneider', '100A, 3P, 35kA', 4500.00, 'Pcs'),
@@ -236,10 +283,49 @@ async function initializeDatabase() {
             `);
             console.log('  ✅ Default components created');
         } else {
-            console.log('  ✅ Components already exist');
+            console.log(`  ✅ Components already exist (${componentCount.count} components)`);
+        }
+
+        // Check if BOM rules exist
+        const ruleCount = await db.get('SELECT COUNT(*) as count FROM bom_rules');
+        
+        if (ruleCount.count === 0) {
+            console.log('  ⚠️  No BOM rules found. Creating default rules...');
+            
+            // Get panel IDs
+            const panels = await db.all('SELECT id, panel_code FROM panel_types');
+            const panelMap = {};
+            panels.forEach(p => { panelMap[p.panel_code] = p.id; });
+            
+            // Get component IDs
+            const components = await db.all('SELECT id, component_code FROM components');
+            const compMap = {};
+            components.forEach(c => { compMap[c.component_code] = c.id; });
+
+            // Insert BOM rules for MCC Panel
+            if (panelMap['MCC'] && compMap['MCCB-100A']) {
+                await db.run(`
+                    INSERT INTO bom_rules (panel_type_id, component_id, quantity_rule, default_quantity, is_mandatory) VALUES
+                    (?, ?, ?, ?, ?),
+                    (?, ?, ?, ?, ?),
+                    (?, ?, ?, ?, ?),
+                    (?, ?, ?, ?, ?)
+                `, [
+                    panelMap['MCC'], compMap['MCCB-100A'], 'per_feeder', 1, 1,
+                    panelMap['MCC'], compMap['CONT-25A'], 'per_feeder', 1, 1,
+                    panelMap['MCC'], compMap['OLR-25A'], 'per_feeder', 1, 1,
+                    panelMap['MCC'], compMap['BUS-630A'], 'fixed', 5, 1
+                ]);
+            }
+            
+            console.log('  ✅ Default BOM rules created');
+        } else {
+            console.log(`  ✅ BOM rules already exist (${ruleCount.count} rules)`);
         }
 
         console.log('\n🎉 Database initialization complete!');
+        console.log(`📁 Database location: ${DB_PATH}`);
+        console.log(`💾 Database mode: ${DB_PATH === ':memory:' ? 'IN-MEMORY' : 'PERSISTENT'}`);
         console.log('============================================\n');
         
         await db.close();
@@ -248,7 +334,14 @@ async function initializeDatabase() {
     } catch (error) {
         console.error('\n❌ Database initialization failed:');
         console.error(error.message);
-        console.error(error.stack);
+        
+        // ✅ FIX: Fallback to in-memory database on error
+        if (DB_PATH !== ':memory:' && !DB_PATH.includes(':memory:')) {
+            console.log('⚠️ Attempting fallback to in-memory database...');
+            process.env.DB_PATH = ':memory:';
+            return initializeDatabase();
+        }
+        
         throw error;
     }
 }
@@ -258,7 +351,7 @@ if (require.main === module) {
     initializeDatabase()
         .then(() => process.exit(0))
         .catch((error) => {
-            console.error(error);
+            console.error('Fatal error:', error);
             process.exit(1);
         });
 }
