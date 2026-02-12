@@ -3,20 +3,24 @@
  * Complete Backend Implementation with SQLite
  */
 
+// =================== REQUIRE MODULES ===================
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
-const fs = require('fs');
 require('dotenv').config();
 
 // Import database initialization
 const initializeDatabase = require('./database/init');
 
-// Import routes
+// ✅ CRITICAL FIX: Import middleware FIRST
+const { authenticateToken } = require('./middleware/auth');  // <-- MUST BE BEFORE ROUTES
+
+// THEN import routes (they depend on middleware)
 const authRoutes = require('./routes/auth');
 const panelRoutes = require('./routes/panels');
 const componentRoutes = require('./routes/components');
