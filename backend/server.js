@@ -1,9 +1,9 @@
 /**
  * AMPRISE PANELS - Production Server
- * Complete Backend Implementation with SQLite
+ * RENDER FREE TIER OPTIMIZED VERSION
  */
 
-// =================== REQUIRE MODULES (ALL AT TOP) ===================
+// =================== REQUIRE MODULES ===================
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
@@ -17,31 +17,34 @@ require('dotenv').config();
 // Import database initialization
 const initializeDatabase = require('./database/init');
 
-// Import routes - NO AUTH MIDDLEWARE IMPORT HERE
+// Import routes
 const authRoutes = require('./routes/auth');
 const panelRoutes = require('./routes/panels');
 const componentRoutes = require('./routes/components');
 const quotationRoutes = require('./routes/quotations');
 
 // =================== DATABASE PATH CONFIGURATION ===================
+// ✅ FIXED FOR RENDER FREE TIER
 const IS_RENDER = !!process.env.RENDER;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 let DB_PATH;
 if (IS_RENDER) {
-    DB_PATH = '/var/data/panel-estimation.db';
-    const dbDir = '/var/data';
-    if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
-    }
+    // ✅ RENDER FREE TIER - Use /opt/render/project/src (writable directory)
+    DB_PATH = path.join('/opt/render/project/src', 'panel-estimation.db');
+    console.log(`📁 Render free tier DB path: ${DB_PATH}`);
 } else {
+    // Local development
     DB_PATH = path.join(__dirname, 'database', 'panel-estimation.db');
+    
+    // Ensure local database directory exists
     const dbDir = path.dirname(DB_PATH);
     if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir, { recursive: true });
     }
 }
 
+// Make DB_PATH available to other modules
 process.env.DB_PATH = DB_PATH;
 
 // =================== INITIALIZE EXPRESS APP ===================
@@ -82,10 +85,26 @@ async function startServer() {
         console.log('   AMPRISE PANELS - ESTIMATION SYSTEM');
         console.log('========================================\n');
         
+        // Initialize database
         console.log('📦 Initializing database...');
         console.log(`📁 Database path: ${DB_PATH}`);
+        
+        // Check if we have write permission
+        try {
+            if (!IS_RENDER || DB_PATH !== ':memory:') {
+                // Test write permission
+                fs.accessSync(path.dirname(DB_PATH), fs.constants.W_OK);
+                console.log('✅ Directory is writable');
+            }
+        } catch (err) {
+            console.log('⚠️ Directory not writable, using in-memory database');
+            DB_PATH = ':memory:';
+            process.env.DB_PATH = DB_PATH;
+        }
+        
         await initializeDatabase();
         
+        // Open database connection
         const sqlite3 = require('sqlite3').verbose();
         const { open } = require('sqlite');
         
@@ -94,7 +113,11 @@ async function startServer() {
             driver: sqlite3.Database
         });
         
-        await db.exec('PRAGMA journal_mode = WAL;');
+        // Enable WAL mode for better concurrency (skip for in-memory)
+        if (DB_PATH !== ':memory:') {
+            await db.exec('PRAGMA journal_mode = WAL;');
+        }
+        
         app.locals.db = db;
         console.log('✅ Database connected successfully');
         
@@ -104,13 +127,16 @@ async function startServer() {
         app.use('/api', componentRoutes);
         app.use('/api', quotationRoutes);
         
-        // =================== HEALTH CHECK ENDPOINTS ===================
+        // =================== HEALTH CHECK ===================
         app.get('/health', (req, res) => {
             res.status(200).json({ 
                 status: 'OK',
                 timestamp: new Date().toISOString(),
                 uptime: process.uptime(),
-                database: app.locals.db ? 'connected' : 'initializing'
+                database: app.locals.db ? 'connected' : 'initializing',
+                environment: process.env.NODE_ENV || 'development',
+                platform: IS_RENDER ? 'render-free' : 'local',
+                db_mode: DB_PATH === ':memory:' ? 'in-memory' : 'persistent'
             });
         });
 
@@ -118,8 +144,7 @@ async function startServer() {
             res.status(200).json({ 
                 status: 'OK',
                 service: 'AMPRISE PANELS API',
-                version: '2.0.0',
-                timestamp: new Date().toISOString()
+                version: '2.0.0'
             });
         });
         
@@ -127,11 +152,10 @@ async function startServer() {
         if (process.env.NODE_ENV === 'production') {
             const frontendPath = path.join(__dirname, '..', 'frontend');
             if (fs.existsSync(frontendPath)) {
-                console.log(`📁 Serving static files from: ${frontendPath}`);
                 app.use(express.static(frontendPath));
                 
                 app.get('*', (req, res) => {
-                    if (!req.path.startsWith('/api')) {
+                    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
                         res.sendFile(path.join(frontendPath, 'index.html'));
                     }
                 });
@@ -157,25 +181,27 @@ async function startServer() {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
             console.log('========================================\n');
             console.log(`💾 Database: ${DB_PATH}`);
+            console.log(`📊 Mode: ${DB_PATH === ':memory:' ? 'IN-MEMORY (data resets on restart)' : 'PERSISTENT'}`);
             console.log('✅ System ready for production use!\n');
         });
         
     } catch (error) {
-        console.error('\n❌ Failed to start server:', error);
+        console.error('\n❌ Failed to start server:');
+        console.error(error);
         process.exit(1);
     }
 }
 
+// Handle process events
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
-    process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
 });
 
+// Start server
 startServer();
 
 module.exports = app;
