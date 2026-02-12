@@ -1,8 +1,3 @@
-/**
- * AMPRISE PANELS - Authentication Middleware
- * JWT Token Verification & Role-Based Access Control
- */
-
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'amprise-panel-secret-key-2024-industrial-grade';
@@ -41,7 +36,7 @@ const authenticateToken = (req, res, next) => {
 
 /**
  * Role-Based Access Control
- * @param {Array} allowedRoles - Array of roles allowed to access the route
+ * @param {Array|String} allowedRoles - Array or single role allowed
  */
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
@@ -50,6 +45,11 @@ const authorize = (allowedRoles) => {
                 error: 'Authentication required',
                 code: 'NO_AUTH'
             });
+        }
+        
+        // Convert single role to array
+        if (typeof allowedRoles === 'string') {
+            allowedRoles = [allowedRoles];
         }
         
         if (!allowedRoles.includes(req.user.role)) {
@@ -65,7 +65,6 @@ const authorize = (allowedRoles) => {
     };
 };
 
-// ✅ FIX: Export BOTH functions
 module.exports = {
     authenticateToken,
     authorize,
