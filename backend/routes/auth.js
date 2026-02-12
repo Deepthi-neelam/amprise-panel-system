@@ -2,7 +2,8 @@
  * AMPRISE PANELS - Authentication Routes
  * Login, Register, Profile Management
  */
-
+// At the VERY TOP of auth.js, add this import:
+const { authenticateToken, authorize } = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
