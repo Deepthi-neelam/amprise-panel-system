@@ -65,6 +65,7 @@ const authorize = (allowedRoles) => {
     };
 };
 
+// ✅ FIX: Export BOTH functions
 module.exports = {
     authenticateToken,
     authorize,
